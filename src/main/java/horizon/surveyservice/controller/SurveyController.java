@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/survey")
@@ -45,13 +46,13 @@ public class SurveyController {
     }
 
     @PostMapping("/{surveyId}/question/{questionId}")
-    public ResponseEntity<SurveyDto> assignQuestionToSurvey(@PathVariable Long surveyId, @PathVariable Long questionId) {
+    public ResponseEntity<SurveyDto> assignQuestionToSurvey(@PathVariable Long surveyId, @PathVariable UUID questionId) {
         surveyService.assignQuestionToSurvey(surveyId, questionId);
         return ResponseEntity.ok(surveyService.getSurveyById(surveyId));
     }
 
     @DeleteMapping("/{surveyId}/question/{questionId}")
-    public ResponseEntity<SurveyDto> unassignQuestionFromSurvey(@PathVariable Long surveyId, @PathVariable Long questionId) {
+    public ResponseEntity<SurveyDto> unassignQuestionFromSurvey(@PathVariable Long surveyId, @PathVariable UUID questionId) {
         surveyService.unassignQuestionFromSurvey(surveyId, questionId);
         return ResponseEntity.ok(surveyService.getSurveyById(surveyId));
     }

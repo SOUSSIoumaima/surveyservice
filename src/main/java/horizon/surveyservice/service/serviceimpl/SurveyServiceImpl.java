@@ -12,6 +12,7 @@ import horizon.surveyservice.service.SurveyService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,7 +76,7 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void assignQuestionToSurvey(Long surveyId, Long questionId) {
+    public void assignQuestionToSurvey(Long surveyId, UUID questionId) {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
         if (survey.isLocked()) {
@@ -95,7 +96,7 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void unassignQuestionFromSurvey(Long surveyId, Long questionId) {
+    public void unassignQuestionFromSurvey(Long surveyId, UUID questionId) {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
         if (survey.isLocked()) {

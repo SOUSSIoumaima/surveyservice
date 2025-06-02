@@ -26,6 +26,7 @@ public class OptionController {
         return ResponseEntity.ok(optionService.createOption(optionDto));
     }
 
+    @PreAuthorize("hasAnyAuthority('PERMISSION_CREATE','ADMIN_ROOT')")
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOptionById(@PathVariable UUID id) {

@@ -10,6 +10,7 @@ import horizon.surveyservice.service.QuestionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +37,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionDto getQuestionById(Long id) {
+    public QuestionDto getQuestionById(UUID id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:"+id));
         return QuestionMapper.toDTO(question);
@@ -46,7 +47,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 
     @Override
-    public QuestionDto updateQuestion(Long id,QuestionDto questionDto) {
+    public QuestionDto updateQuestion(UUID id,QuestionDto questionDto) {
         Question existing = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:"+id));
         if (existing.isLocked()){
@@ -74,7 +75,7 @@ public class QuestionServiceImpl implements QuestionService {
 
 
     @Override
-    public void deleteQuestion(Long id) {
+    public void deleteQuestion(UUID id) {
         Question existing = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:" + id));
         if (existing.isLocked()) {
@@ -85,7 +86,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionDto lockQuestion(Long id) {
+    public QuestionDto lockQuestion(UUID id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:"+id));
         question.setLocked(true);
@@ -94,7 +95,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionDto unlockQuestion(Long id) {
+    public QuestionDto unlockQuestion(UUID id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:"+id));
         question.setLocked(false);

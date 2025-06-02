@@ -1,22 +1,20 @@
 package horizon.surveyservice.DTO;
 
 import horizon.surveyservice.entity.QuestionType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 import java.util.List;
+import java.util.UUID;
 
 public class QuestionDto {
-    private Long questionId;
+    private UUID questionId;
     private String subject;
     private String questionText;
     private QuestionType questionType;
     private boolean locked;
     private List<OptionDto> options;
 
-    public QuestionDto(Long questionId, String subject, String questionText, QuestionType questionType, boolean locked, List<OptionDto> options) {
+    public QuestionDto(UUID questionId, String subject, String questionText, QuestionType questionType, boolean locked, List<OptionDto> options) {
         this.questionId = questionId;
         this.subject = subject;
         this.questionText = questionText;
@@ -27,11 +25,12 @@ public class QuestionDto {
 
     public QuestionDto() {
     }
-    public Long getQuestionId() {
+
+    public UUID getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(Long questionId) {
+    public void setQuestionId(UUID questionId) {
         this.questionId = questionId;
     }
 

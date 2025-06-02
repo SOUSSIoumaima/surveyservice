@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/options")
@@ -27,13 +28,13 @@ public class OptionController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOptionById(@PathVariable Long id) {
+    public ResponseEntity<?> getOptionById(@PathVariable UUID id) {
             OptionDto optionDto = optionService.getOptionById(id);
             return ResponseEntity.ok(optionDto);
     }
 
     @GetMapping("/byQuestion/{questionId}")
-    public ResponseEntity<?> getOptionByQuestionId(@PathVariable Long questionId) {
+    public ResponseEntity<?> getOptionByQuestionId(@PathVariable UUID questionId) {
         List<OptionDto> options = optionService.getOptionByQuestionId(questionId);
         return ResponseEntity.ok(options);
     }
@@ -44,25 +45,25 @@ public class OptionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOption(@PathVariable Long id, @RequestBody OptionDto optionDto) {
+    public ResponseEntity<?> updateOption(@PathVariable UUID id, @RequestBody OptionDto optionDto) {
         OptionDto updatedOption = optionService.updateOption(id, optionDto);
         return ResponseEntity.ok(updatedOption);
 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<List<OptionDto>> deleteOption(@PathVariable Long id) {
+    public ResponseEntity<List<OptionDto>> deleteOption(@PathVariable UUID id) {
         optionService.deleteOption(id);
         List<OptionDto> options = optionService.getAllOptions();
         return ResponseEntity.ok(options);
 
     }
     @PatchMapping("/{id}/lock")
-    public ResponseEntity<OptionDto> lockOption(@PathVariable Long id) {
+    public ResponseEntity<OptionDto> lockOption(@PathVariable UUID id) {
         return ResponseEntity.ok(optionService.lockOption(id));
     }
     @PatchMapping("/{id}/unlock")
-    public ResponseEntity<OptionDto> unlockOption(@PathVariable Long id) {
+    public ResponseEntity<OptionDto> unlockOption(@PathVariable UUID id) {
         return ResponseEntity.ok(optionService.unlockOption(id));
     }
 

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/questions")
@@ -31,18 +32,18 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getAllQuestions());
     }
     @GetMapping("/{id}")
-    public ResponseEntity<QuestionDto> getQuestionById(@PathVariable Long id) {
+    public ResponseEntity<QuestionDto> getQuestionById(@PathVariable UUID id) {
         QuestionDto question = questionService.getQuestionById(id);
         return ResponseEntity.ok(question);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateQuestion(@PathVariable Long id, @RequestBody QuestionDto questionDto) {
+    public ResponseEntity<?> updateQuestion(@PathVariable UUID id, @RequestBody QuestionDto questionDto) {
         QuestionDto updated = questionService.updateQuestion(id, questionDto);
         return ResponseEntity.ok(updated);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteQuestion(@PathVariable Long id) {
+    public ResponseEntity<?> deleteQuestion(@PathVariable UUID id) {
         questionService.deleteQuestion(id);
         List<QuestionDto> questions = questionService.getAllQuestions();
         return ResponseEntity.ok(questions);
@@ -53,7 +54,7 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getBySubject(subject));
     }
     @PatchMapping("/{id}/lock")
-    public ResponseEntity<?> lockQuestion(@PathVariable Long id) {
+    public ResponseEntity<?> lockQuestion(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(questionService.lockQuestion(id));
         } catch (ResourceNotFoundException e) {
@@ -62,7 +63,7 @@ public class QuestionController {
     }
 
     @PatchMapping("/{id}/unlock")
-    public ResponseEntity<?> unlockQuestion(@PathVariable Long id) {
+    public ResponseEntity<?> unlockQuestion(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(questionService.unlockQuestion(id));
         } catch (ResourceNotFoundException e) {

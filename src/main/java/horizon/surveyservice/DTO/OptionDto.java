@@ -1,16 +1,17 @@
 package horizon.surveyservice.DTO;
 
 
+import java.util.UUID;
 
 public class OptionDto {
-    private Long optionId;
-    private Long questionId;
+    private UUID optionId;
+    private UUID questionId;
     private String optionText;
     private boolean isCorrect;
     private Long optionScore;
     private boolean isLocked;
 
-    public OptionDto(Long optionId, Long questionId, String optionText, Long optionScore, boolean isCorrect, boolean isLocked) {
+    public OptionDto(UUID optionId, UUID questionId, String optionText, Long optionScore, boolean isCorrect, boolean isLocked) {
         this.optionId = optionId;
         this.questionId = questionId;
         this.optionText = optionText;
@@ -22,14 +23,14 @@ public class OptionDto {
     }
 
 
-
-    public Long getOptionId() {
+    public UUID getOptionId() {
         return optionId;
     }
 
-    public Long getQuestionId() {
-        return questionId;
+    public void setOptionId(UUID optionId) {
+        this.optionId = optionId;
     }
+
 
     public String getOptionText() {
         return optionText;
@@ -45,11 +46,13 @@ public class OptionDto {
         return optionScore;
     }
 
-    public void setOptionId(Long optionId) {
-        this.optionId = optionId;
+    public UUID getQuestionId() {
+        return questionId;
     }
 
-    public void setQuestionId(Long questionId) {this.questionId = questionId;}
+    public void setQuestionId(UUID questionId) {
+        this.questionId = questionId;
+    }
 
     public void setOptionText(String optionText) {
         this.optionText = optionText;

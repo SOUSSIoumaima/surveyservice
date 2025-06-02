@@ -1,17 +1,20 @@
 package horizon.surveyservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import lombok.*;
+
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "Question")
 public class Question {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long questionId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
+    private UUID questionId;
 
     private String subject;
 
@@ -25,13 +28,13 @@ public class Question {
 
     private boolean locked;
 
-    public Question(boolean locked, List<Option> options, QuestionType questionType, String questionText, String subject, Long questionId) {
-        this.locked = locked;
-        this.options = options;
-        this.questionType = questionType;
-        this.questionText = questionText;
-        this.subject = subject;
+    public Question(UUID questionId, String subject, String questionText, QuestionType questionType, List<Option> options, boolean locked) {
         this.questionId = questionId;
+        this.subject = subject;
+        this.questionText = questionText;
+        this.questionType = questionType;
+        this.options = options;
+        this.locked = locked;
     }
 
     public Question() {
@@ -45,11 +48,11 @@ public class Question {
         this.locked = locked;
     }
 
-    public Long getQuestionId() {
+    public UUID getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(Long questionId) {
+    public void setQuestionId(UUID questionId) {
         this.questionId = questionId;
     }
 

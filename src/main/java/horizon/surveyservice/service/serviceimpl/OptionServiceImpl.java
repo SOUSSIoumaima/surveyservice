@@ -13,6 +13,7 @@ import horizon.surveyservice.service.OptionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 @Service
 public class OptionServiceImpl implements OptionService {
@@ -33,7 +34,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
-    public OptionDto updateOption(Long id, OptionDto optionDto) {
+    public OptionDto updateOption(UUID id, OptionDto optionDto) {
         Option existing = optionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Option not found with id:"+ id));
         if (existing.isLocked()) {
@@ -51,14 +52,14 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
-    public OptionDto getOptionById(Long id) {
+    public OptionDto getOptionById(UUID id) {
         Option option = optionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Option not found with id:"+ id));
         return OptionMapper.toDto(option);
     }
 
     @Override
-    public List<OptionDto> getOptionByQuestionId(Long questionId) {
+    public List<OptionDto> getOptionByQuestionId(UUID questionId) {
         List<Option> option = optionRepository.findByQuestionQuestionId(questionId);
         if (option.isEmpty()) {
             throw new ResourceNotFoundException("Option not found with Question id :"+questionId);
@@ -76,7 +77,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
-    public void deleteOption(Long id) {
+    public void deleteOption(UUID id) {
         Option existing = optionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Option not found with id: " + id));
         if (existing.isLocked()) {
@@ -87,7 +88,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
-    public OptionDto lockOption(Long id) {
+    public OptionDto lockOption(UUID id) {
         Option option = optionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Option not found with id: " + id));
         option.setLocked(true);
@@ -96,7 +97,7 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
-    public OptionDto unlockOption(Long id) {
+    public OptionDto unlockOption(UUID id) {
         Option option = optionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Option not found with id: " + id));
         option.setLocked(false);

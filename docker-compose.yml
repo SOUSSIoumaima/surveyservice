@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: my_postgres
+    environment:
+      POSTGRES_DB: surveydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgresql
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springboot_app
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/surveydb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgresql
+    volumes:
+      - ~/.m2:/root/.m2 # ✅ Cache Maven entre les builds (optionnel mais recommandé)
+
+volumes:
+  pgdata:

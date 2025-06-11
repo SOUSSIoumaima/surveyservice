@@ -1,27 +1,38 @@
 package horizon.surveyservice.security;
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import io.jsonwebtoken.Claims;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.util.AntPathMatcher;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-    private final JwtTokenUtil JwtTokenUtil;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    public JwtRequestFilter(JwtTokenUtil JwtTokenUtil) {
-        this.JwtTokenUtil = JwtTokenUtil;
+
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/actuator/health",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+
+    };
+
+    public JwtRequestFilter(JwtTokenUtil jwtTokenUtil) {
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     @Override
@@ -30,9 +41,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        System.out.println("Incoming request path: " + request.getRequestURI());
-        String path = request.getRequestURI();
-        if (path.startsWith("/api/auth")) {
+        // Skip JWT validation for public endpoints
+        if (isPublicEndpoint(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -40,17 +50,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         final String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
             return;
         }
 
         try {
             final String token = authorizationHeader.substring(7);
-            final Claims claims = JwtTokenUtil.getAllClaimsFromToken(token);
-            final String username = JwtTokenUtil.extractUsername(token);
+
+            if (!jwtTokenUtil.isTokenValid(token)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT token");
+                return;
+            }
+
+            final String username = jwtTokenUtil.extractUsername(token);
+            final UUID organizationId = jwtTokenUtil.extractOrganizationId(token);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                List<String> authorities = claims.get("authorities", List.class);
+                List<String> authorities = jwtTokenUtil.extractAuthorities(token);
                 List<GrantedAuthority> grantedAuthorities = authorities.stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
@@ -64,14 +80,35 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 authentication.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request));
 
+                if (organizationId != null) {
+                    request.setAttribute("organizationId", organizationId);
+                }
+                request.setAttribute("username", username);
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token: " + e.getMessage());
             return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPublicEndpoint(HttpServletRequest request) {
+        String requestPath = request.getRequestURI();
+
+
+
+        for (String pattern : PUBLIC_ENDPOINTS) {
+            if (pathMatcher.match(pattern, requestPath)) {
+
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }

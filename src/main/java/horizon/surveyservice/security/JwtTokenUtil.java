@@ -1,55 +1,50 @@
 package horizon.surveyservice.security;
 
+
+
+
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
-
-import java.util.*;
+import org.springframework.stereotype.Component;
 import java.security.Key;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
-    private final String secret;
-    private final long expiration;
     private final Key signingKey;
 
-    public JwtTokenUtil (@Value("${jwt.secret}") String secret,
-                         @Value("${jwt.expiration}") long expiration) {
-        this.secret = secret;
-        this.expiration = expiration;
+    public JwtTokenUtil(@Value("${jwt.secret}") String secret) {
         this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
-    }
-
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("authorities", userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
-        return createToken(claims, userDetails.getUsername());
-    }
-
-    private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(signingKey, SignatureAlgorithm.HS256)
-                .compact();
     }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public UUID extractOrganizationId(String token) {
+        try {
+            Claims claims = getAllClaimsFromToken(token);
+            String orgId = (String) claims.get("organizationId");
+            return orgId != null ? UUID.fromString(orgId) : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> extractAuthorities(String token) {
+        try {
+            Claims claims = getAllClaimsFromToken(token);
+            List<String> authorities = (List<String>) claims.get("authorities");
+            return authorities != null ? authorities : new ArrayList<>();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     public Date extractExpiration(String token) {
@@ -61,7 +56,6 @@ public class JwtTokenUtil {
         return claimsResolver.apply(claims);
     }
 
-    // Changed from private to public
     public Claims getAllClaimsFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(signingKey)
@@ -70,12 +64,20 @@ public class JwtTokenUtil {
                 .getBody();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public Boolean isTokenValid(String token) {
+        try {
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
+    }
+
+    public Boolean hasOrganizationId(String token) {
+        UUID orgId = extractOrganizationId(token);
+        return orgId != null;
     }
 }

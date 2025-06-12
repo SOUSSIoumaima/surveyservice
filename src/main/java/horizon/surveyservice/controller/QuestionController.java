@@ -23,32 +23,32 @@ public class QuestionController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('QUESTION_CREATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_CREATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<QuestionDto> createQuestion(@RequestBody QuestionDto questionDto) {
         QuestionDto created = questionService.createQuestion(questionDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('QUESTION_READ','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<QuestionDto>> getAllQuestions() {
         return ResponseEntity.ok(questionService.getAllQuestions());
     }
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('QUESTION_READ','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<QuestionDto> getQuestionById(@PathVariable UUID id) {
         QuestionDto question = questionService.getQuestionById(id);
         return ResponseEntity.ok(question);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('QUESTION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<?> updateQuestion(@PathVariable UUID id, @RequestBody QuestionDto questionDto) {
         QuestionDto updated = questionService.updateQuestion(id, questionDto);
         return ResponseEntity.ok(updated);
     }
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('QUESTION_DELETE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_DELETE','SYS_ADMIN_ROOT')")
     public ResponseEntity<?> deleteQuestion(@PathVariable UUID id) {
         questionService.deleteQuestion(id);
         List<QuestionDto> questions = questionService.getAllQuestions();
@@ -56,12 +56,12 @@ public class QuestionController {
 
     }
     @GetMapping("/subject/{subject}")
-    @PreAuthorize("hasAnyAuthority('QUESTION_READ','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<QuestionDto>> getBySubject(@PathVariable String subject) {
         return ResponseEntity.ok(questionService.getBySubject(subject));
     }
     @PatchMapping("/{id}/lock")
-    @PreAuthorize("hasAnyAuthority('QUESTION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<?> lockQuestion(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(questionService.lockQuestion(id));
@@ -71,7 +71,7 @@ public class QuestionController {
     }
 
     @PatchMapping("/{id}/unlock")
-    @PreAuthorize("hasAnyAuthority('QUESTION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<?> unlockQuestion(@PathVariable UUID id) {
         try {
             return ResponseEntity.ok(questionService.unlockQuestion(id));

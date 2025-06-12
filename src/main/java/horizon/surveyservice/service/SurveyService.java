@@ -8,11 +8,13 @@ import java.util.UUID;
 public interface SurveyService {
     SurveyDto createSurvey(SurveyDto surveyDto);
     List<SurveyDto> getAllSurveys();
-    SurveyDto getSurveyById(Long surveyId);
-    SurveyDto updateSurvey(Long surveyId, SurveyDto surveyDto);
-    void deleteSurvey(Long surveyId);
-    void assignQuestionToSurvey(Long surveyId, UUID questionId);
-    void unassignQuestionFromSurvey(Long surveyId, UUID questionId);
-    SurveyDto lockSurvey(Long id);
-    SurveyDto unlockSurvey(Long id);
+    SurveyDto getSurveyById(UUID surveyId);
+    List<SurveyDto> getSurveysByOrganization(UUID organizationId);
+
+    SurveyDto updateSurvey(UUID surveyId, SurveyDto surveyDto);
+    void deleteSurvey(UUID surveyId);
+    void assignQuestionToSurvey(UUID surveyId, UUID questionId);
+    void unassignQuestionFromSurvey(UUID surveyId, UUID questionId);
+    SurveyDto lockSurvey(UUID id);
+    SurveyDto unlockSurvey(UUID id);
 }

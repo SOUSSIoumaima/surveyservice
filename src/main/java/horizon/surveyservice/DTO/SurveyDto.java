@@ -6,10 +6,12 @@ import jakarta.persistence.OneToMany;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class SurveyDto {
-    private Long surveyId;
-    private Long ownerId;
+    private UUID surveyId;
+    private UUID ownerId;
+    private UUID organizationId;
     private SurveyType type;
     private String title;
     private String description;
@@ -22,19 +24,27 @@ public class SurveyDto {
 
     public SurveyDto() {}
 
-    public Long getSurveyId() {
+    public UUID getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(UUID organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public UUID getSurveyId() {
         return surveyId;
     }
 
-    public void setSurveyId(Long surveyId) {
+    public void setSurveyId(UUID surveyId) {
         this.surveyId = surveyId;
     }
 
-    public Long getOwnerId() {
+    public UUID getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Long ownerId) {
+    public void setOwnerId(UUID ownerId) {
         this.ownerId = ownerId;
     }
 

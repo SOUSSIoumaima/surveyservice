@@ -4,15 +4,18 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "survey")
 public class Survey {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long surveyId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
+    private UUID surveyId;
+    private UUID organizationId;
 
-    private Long ownerId;
+    private UUID ownerId;
     private SurveyType type;
     private String title;
     private String description;
@@ -34,7 +37,7 @@ public class Survey {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
-    public Survey(Long ownerId, SurveyType type, String title, SurveyStatus status) {
+    public Survey(UUID ownerId, SurveyType type, String title, SurveyStatus status) {
         this();
         this.ownerId = ownerId;
         this.type = type;
@@ -51,19 +54,28 @@ public class Survey {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Long getSurveyId() {
+    public UUID getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(UUID organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public UUID getSurveyId() {
         return surveyId;
     }
 
-    public void setSurveyId(Long surveyId) {
+
+    public void setSurveyId(UUID surveyId) {
         this.surveyId = surveyId;
     }
 
-    public Long getOwnerId() {
+    public UUID getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Long ownerId) {
+    public void setOwnerId(UUID ownerId) {
         this.ownerId = ownerId;
     }
 

@@ -9,6 +9,7 @@ import horizon.surveyservice.mapper.SurveyMapper;
 import horizon.surveyservice.repository.QuestionRepository;
 import horizon.surveyservice.repository.SurveyRepository;
 import horizon.surveyservice.service.SurveyService;
+import horizon.surveyservice.util.OrganizationContextUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,13 +21,18 @@ public class SurveyServiceImpl implements SurveyService {
 
     private final SurveyRepository surveyRepository;
     private final QuestionRepository questionRepository;
+    private final OrganizationContextUtil organizationContextUtil;
 
-    public SurveyServiceImpl(SurveyRepository surveyRepository, QuestionRepository questionRepository) {
+
+    public SurveyServiceImpl(SurveyRepository surveyRepository, QuestionRepository questionRepository, OrganizationContextUtil organizationContextUtil) {
+        this.organizationContextUtil = organizationContextUtil;
         this.surveyRepository = surveyRepository;
         this.questionRepository = questionRepository;
     }
     @Override
     public SurveyDto createSurvey(SurveyDto surveyDto) {
+        UUID currentOrgId = organizationContextUtil.getCurrentOrganizationId();
+        surveyDto.setOrganizationId(currentOrgId);
         Survey survey = SurveyMapper.toSurveyEntity(surveyDto);
         Survey saved=surveyRepository.save(survey);
         return SurveyMapper.toSurveyDto(saved);
@@ -36,22 +42,33 @@ public class SurveyServiceImpl implements SurveyService {
     public List<SurveyDto> getAllSurveys() {
         List<Survey> surveys = surveyRepository.findAll();
         return surveys.stream()
+                .filter(s -> {
+                    try {
+                        organizationContextUtil.validateOrganizationAccess(s.getOrganizationId());
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
                 .map(SurveyMapper::toSurveyDto)
                 .collect(Collectors.toList());
 
     }
 
     @Override
-    public SurveyDto getSurveyById(Long surveyId) {
+    public SurveyDto getSurveyById(UUID surveyId) {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + surveyId));
+        organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
         return SurveyMapper.toSurveyDto(survey);
     }
 
     @Override
-    public SurveyDto updateSurvey(Long surveyId, SurveyDto surveyDto) {
+    public SurveyDto updateSurvey(UUID surveyId, SurveyDto surveyDto) {
         Survey existing = surveyRepository.findById(surveyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + surveyId));
+        organizationContextUtil.validateOrganizationAccess(existing.getOrganizationId());
+
         if (existing.isLocked()){
             throw new LockedException("Survey is locked cannot be updated");
         }
@@ -65,9 +82,11 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void deleteSurvey(Long surveyId) {
+    public void deleteSurvey(UUID surveyId) {
         Survey existing = surveyRepository.findById(surveyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + surveyId));
+        organizationContextUtil.validateOrganizationAccess(existing.getOrganizationId());
+
         if (existing.isLocked()) {
             throw new LockedException("Survey is locked and cannot be deleted");
         }
@@ -76,9 +95,11 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void assignQuestionToSurvey(Long surveyId, UUID questionId) {
+    public void assignQuestionToSurvey(UUID surveyId, UUID questionId) {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
+        organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+
         if (survey.isLocked()) {
             throw new LockedException("Survey is locked and cannot be modified");
         }
@@ -96,9 +117,10 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void unassignQuestionFromSurvey(Long surveyId, UUID questionId) {
+    public void unassignQuestionFromSurvey(UUID surveyId, UUID questionId) {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
+        organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
         if (survey.isLocked()) {
             throw new LockedException("Survey is locked and cannot be modified");
         }
@@ -116,20 +138,32 @@ public class SurveyServiceImpl implements SurveyService {
         }
 
     }
+    @Override
+    public List<SurveyDto> getSurveysByOrganization(UUID organizationId) {
+        List<Survey> surveys = surveyRepository.findByOrganizationId(organizationId);
+        return surveys.stream()
+                .map(SurveyMapper::toSurveyDto)
+                .collect(Collectors.toList());
+    }
+
 
     @Override
-    public SurveyDto lockSurvey(Long id) {
+    public SurveyDto lockSurvey(UUID id) {
         Survey survey = surveyRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + id));
+        organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+
         survey.setLocked(true);
         surveyRepository.save(survey);
         return SurveyMapper.toSurveyDto(survey);
     }
 
     @Override
-    public SurveyDto unlockSurvey(Long id) {
+    public SurveyDto unlockSurvey(UUID id) {
         Survey survey = surveyRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + id));
+        organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+
         survey.setLocked(false);
         surveyRepository.save(survey);
         return SurveyMapper.toSurveyDto(survey);

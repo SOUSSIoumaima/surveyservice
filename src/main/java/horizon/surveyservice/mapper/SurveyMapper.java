@@ -15,6 +15,7 @@ public class SurveyMapper {
         SurveyDto dto = new SurveyDto();
         dto.setSurveyId(survey.getSurveyId());
         dto.setOwnerId(survey.getOwnerId());
+        dto.setOrganizationId(survey.getOrganizationId());
         dto.setType(survey.getType());
         dto.setTitle(survey.getTitle());
         dto.setDescription(survey.getDescription());
@@ -45,6 +46,7 @@ public class SurveyMapper {
         survey.setUpdatedAt(dto.getUpdatedAt());
         survey.setDeadline(dto.getDeadline());
         survey.setLocked(dto.isLocked());
+
         if (dto.getQuestions() != null) {
             List<Question> questions = dto.getQuestions()
                     .stream()

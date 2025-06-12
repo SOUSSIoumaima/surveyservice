@@ -12,9 +12,9 @@ public class SurveyMapper {
 
     public static SurveyDto toSurveyDto(Survey survey) {
         if (survey == null) return null;
+
         SurveyDto dto = new SurveyDto();
         dto.setSurveyId(survey.getSurveyId());
-
         dto.setOrganizationId(survey.getOrganizationId());
         dto.setType(survey.getType());
         dto.setTitle(survey.getTitle());
@@ -24,19 +24,23 @@ public class SurveyMapper {
         dto.setUpdatedAt(survey.getUpdatedAt());
         dto.setDeadline(survey.getDeadline());
         dto.setLocked(survey.isLocked());
-        if (survey.getQuestions() != null) {
-            List<QuestionDto> questionsDto = survey.getQuestions()
-                    .stream()
+
+        if (survey.getQuestions() != null && !survey.getQuestions().isEmpty()) {
+            List<QuestionDto> questionsDto = survey.getQuestions().stream()
                     .map(QuestionMapper::toDTO)
                     .collect(Collectors.toList());
             dto.setQuestions(questionsDto);
         }
+
         return dto;
     }
+
     public static Survey toSurveyEntity(SurveyDto dto) {
         if (dto == null) return null;
+
         Survey survey = new Survey();
         survey.setSurveyId(dto.getSurveyId());
+        survey.setOrganizationId(dto.getOrganizationId()); // ✅ Important
         survey.setType(dto.getType());
         survey.setTitle(dto.getTitle());
         survey.setDescription(dto.getDescription());
@@ -46,14 +50,14 @@ public class SurveyMapper {
         survey.setDeadline(dto.getDeadline());
         survey.setLocked(dto.isLocked());
 
-        if (dto.getQuestions() != null) {
-            List<Question> questions = dto.getQuestions()
-                    .stream()
-                    .map(questionDto -> QuestionMapper.toEntity(questionDto))
+        if (dto.getQuestions() != null && !dto.getQuestions().isEmpty()) {
+            List<Question> questions = dto.getQuestions().stream()
+                    .map(QuestionMapper::toEntity)
                     .collect(Collectors.toList());
             survey.setQuestions(questions);
         }
+
         return survey;
     }
-
 }
+

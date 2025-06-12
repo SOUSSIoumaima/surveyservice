@@ -21,34 +21,34 @@ public class OptionController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('OPTION_CREATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_CREATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<OptionDto> createOption(@RequestBody OptionDto optionDto) {
         return ResponseEntity.ok(optionService.createOption(optionDto));
     }
 
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('OPTION_READ','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<?> getOptionById(@PathVariable UUID id) {
             OptionDto optionDto = optionService.getOptionById(id);
             return ResponseEntity.ok(optionDto);
     }
 
     @GetMapping("/byQuestion/{questionId}")
-    @PreAuthorize("hasAnyAuthority('OPTION_READ','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<?> getOptionByQuestionId(@PathVariable UUID questionId) {
         List<OptionDto> options = optionService.getOptionByQuestionId(questionId);
         return ResponseEntity.ok(options);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('OPTION_READ','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<OptionDto>> getAllOptions() {
         return ResponseEntity.ok(optionService.getAllOptions());
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('OPTION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<?> updateOption(@PathVariable UUID id, @RequestBody OptionDto optionDto) {
         OptionDto updatedOption = optionService.updateOption(id, optionDto);
         return ResponseEntity.ok(updatedOption);
@@ -56,7 +56,7 @@ public class OptionController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('OPTION_DELETE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_DELETE','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<OptionDto>> deleteOption(@PathVariable UUID id) {
         optionService.deleteOption(id);
         List<OptionDto> options = optionService.getAllOptions();
@@ -64,12 +64,12 @@ public class OptionController {
 
     }
     @PatchMapping("/{id}/lock")
-    @PreAuthorize("hasAnyAuthority('OPTION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<OptionDto> lockOption(@PathVariable UUID id) {
         return ResponseEntity.ok(optionService.lockOption(id));
     }
     @PatchMapping("/{id}/unlock")
-    @PreAuthorize("hasAnyAuthority('OPTION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<OptionDto> unlockOption(@PathVariable UUID id) {
         return ResponseEntity.ok(optionService.unlockOption(id));
     }

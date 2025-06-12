@@ -14,7 +14,7 @@ public class SurveyMapper {
         if (survey == null) return null;
         SurveyDto dto = new SurveyDto();
         dto.setSurveyId(survey.getSurveyId());
-        dto.setOwnerId(survey.getOwnerId());
+
         dto.setOrganizationId(survey.getOrganizationId());
         dto.setType(survey.getType());
         dto.setTitle(survey.getTitle());
@@ -37,7 +37,6 @@ public class SurveyMapper {
         if (dto == null) return null;
         Survey survey = new Survey();
         survey.setSurveyId(dto.getSurveyId());
-        survey.setOwnerId(dto.getOwnerId());
         survey.setType(dto.getType());
         survey.setTitle(dto.getTitle());
         survey.setDescription(dto.getDescription());

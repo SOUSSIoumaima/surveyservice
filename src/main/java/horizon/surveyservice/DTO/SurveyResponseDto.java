@@ -2,17 +2,18 @@ package horizon.surveyservice.DTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class SurveyResponseDto {
-    private Long surveyResponseId;
-    private Long surveyId;
-    private Long respondentId;
+    private UUID surveyResponseId;
+    private UUID surveyId;
+    private UUID respondentId;
     private LocalDateTime submittedAt;
     private Long totalScore;
     private List<QuestionResponseDto> questionResponses;
 
 
-    public SurveyResponseDto(Long surveyResponseId, Long surveyId, Long respondentId, LocalDateTime submittedAt, Long totalScore, List<QuestionResponseDto> questionResponses) {
+    public SurveyResponseDto(UUID surveyResponseId, UUID surveyId, UUID respondentId, LocalDateTime submittedAt, Long totalScore, List<QuestionResponseDto> questionResponses) {
         this.surveyResponseId = surveyResponseId;
         this.surveyId = surveyId;
         this.respondentId = respondentId;
@@ -22,27 +23,27 @@ public class SurveyResponseDto {
     }
     public SurveyResponseDto() {}
 
-    public Long getSurveyResponseId() {
+    public UUID getSurveyResponseId() {
         return surveyResponseId;
     }
 
-    public void setSurveyResponseId(Long surveyResponseId) {
+    public void setSurveyResponseId(UUID surveyResponseId) {
         this.surveyResponseId = surveyResponseId;
     }
 
-    public Long getSurveyId() {
+    public UUID getSurveyId() {
         return surveyId;
     }
 
-    public void setSurveyId(Long surveyId) {
+    public void setSurveyId(UUID surveyId) {
         this.surveyId = surveyId;
     }
 
-    public Long getRespondentId() {
+    public UUID getRespondentId() {
         return respondentId;
     }
 
-    public void setRespondentId(Long respondentId) {
+    public void setRespondentId(UUID respondentId) {
         this.respondentId = respondentId;
     }
 

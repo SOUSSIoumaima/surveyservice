@@ -2,21 +2,22 @@ package horizon.surveyservice.DTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class QuestionResponseDto {
-    private Long questionResponseId;
-    private Long questionId;
-    private Long surveyResponseId;
+    private UUID questionResponseId;
+    private UUID questionId;
+    private UUID surveyResponseId;
     private String questionText;
     private Long questionScore;
     private LocalDateTime submittedAt;
     private List<OptionResponseDto> optionResponses;
 
-    public QuestionResponseDto(Long questionResponseId, Long questionId, String questionText, Long surveyId, Long questionScore, LocalDateTime submittedAt, List<OptionResponseDto> optionResponses) {
+    public QuestionResponseDto(UUID questionResponseId, UUID questionId, UUID surveyResponseId, String questionText, Long questionScore, LocalDateTime submittedAt, List<OptionResponseDto> optionResponses) {
         this.questionResponseId = questionResponseId;
         this.questionId = questionId;
+        this.surveyResponseId = surveyResponseId;
         this.questionText = questionText;
-        this.surveyResponseId = surveyId;
         this.questionScore = questionScore;
         this.submittedAt = submittedAt;
         this.optionResponses = optionResponses;
@@ -24,27 +25,27 @@ public class QuestionResponseDto {
 
     public QuestionResponseDto() {}
 
-    public Long getQuestionId() {
+    public UUID getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(Long questionId) {
+    public void setQuestionId(UUID questionId) {
         this.questionId = questionId;
     }
 
-    public Long getQuestionResponseId() {
+    public UUID getQuestionResponseId() {
         return questionResponseId;
     }
 
-    public void setQuestionResponseId(Long questionResponseId) {
+    public void setQuestionResponseId(UUID questionResponseId) {
         this.questionResponseId = questionResponseId;
     }
 
-    public Long getSurveyResponseId() {
+    public UUID getSurveyResponseId() {
         return surveyResponseId;
     }
 
-    public void setSurveyResponseId(Long surveyId) {
+    public void setSurveyResponseId(UUID surveyId) {
         this.surveyResponseId = surveyId;
     }
 

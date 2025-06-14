@@ -5,12 +5,13 @@ import horizon.surveyservice.DTO.OptionResponseDto;
 
 
 import java.util.List;
+import java.util.UUID;
 
 public interface OptionResponseService {
     OptionResponseDto submitOptionResponse(OptionResponseDto optionResponseDto);
-    OptionResponseDto updateOptionResponse(Long id,OptionResponseDto optionResponseDto);
-    OptionResponseDto getOptionResponseById(Long id);
-    List<OptionResponseDto> getOptionResponseByQuestionResponseId(Long questionResponseId);
+    OptionResponseDto updateOptionResponse(UUID id, OptionResponseDto optionResponseDto);
+    OptionResponseDto getOptionResponseById(UUID id);
+    List<OptionResponseDto> getOptionResponseByQuestionResponseId(UUID questionResponseId);
     List<OptionResponseDto> getAllOptionResponses();
-    void deleteOptionResponse(Long id);
+    void deleteOptionResponse(UUID id);
 }

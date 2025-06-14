@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/option-responses")
@@ -20,12 +21,12 @@ public class OptionResponseController {
         return ResponseEntity.ok(optionResponseService.submitOptionResponse(optionResponseDto));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOptionResponseById(@PathVariable Long id) {
+    public ResponseEntity<?> getOptionResponseById(@PathVariable UUID id) {
         OptionResponseDto optionResponseDto = optionResponseService.getOptionResponseById(id);
         return ResponseEntity.ok(optionResponseDto);
     }
     @GetMapping("/byQuestion/{questionResponseId}")
-    public ResponseEntity<?> getOptionResponseByQuestionResponseId(@PathVariable Long questionResponseId) {
+    public ResponseEntity<?> getOptionResponseByQuestionResponseId(@PathVariable UUID questionResponseId) {
         List<OptionResponseDto> optionResponses = optionResponseService.getOptionResponseByQuestionResponseId(questionResponseId);
         return ResponseEntity.ok(optionResponses);
     }
@@ -35,12 +36,12 @@ public class OptionResponseController {
         return ResponseEntity.ok(optionResponses);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOptionResponse(@PathVariable Long id, @RequestBody OptionResponseDto optionResponseDto) {
+    public ResponseEntity<?> updateOptionResponse(@PathVariable UUID id, @RequestBody OptionResponseDto optionResponseDto) {
         OptionResponseDto updatedOptionResponseDto = optionResponseService.updateOptionResponse(id, optionResponseDto);
         return ResponseEntity.ok(updatedOptionResponseDto);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOptionResponse(@PathVariable Long id) {
+    public ResponseEntity<?> deleteOptionResponse(@PathVariable UUID id) {
         optionResponseService.deleteOptionResponse(id);
         List<OptionResponseDto> optionResponses = optionResponseService.getAllOptionResponses();
         return ResponseEntity.ok(optionResponses);

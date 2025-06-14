@@ -3,14 +3,17 @@ package horizon.surveyservice.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name= "optionResponse")
 public class OptionResponse {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long optionResponseId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
+    private UUID optionResponseId;
     @Column(nullable = false)
-    private Long optionId;
+    private UUID optionId;
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name= "questionResponseId",referencedColumnName = "questionResponseId")
@@ -24,7 +27,7 @@ public class OptionResponse {
     @Column(nullable = false)
     private Long optionScore;
 
-    public OptionResponse(Long optionResponseId, QuestionResponse questionResponse, String optionText, boolean isCorrect, boolean isSelected, Long optionScore) {
+    public OptionResponse(UUID optionResponseId, QuestionResponse questionResponse, String optionText, boolean isCorrect, boolean isSelected, Long optionScore) {
         this.optionResponseId = optionResponseId;
         this.questionResponse = questionResponse;
         this.optionText = optionText;
@@ -35,19 +38,19 @@ public class OptionResponse {
     public OptionResponse() {
     }
 
-    public Long getOptionId() {
+    public UUID getOptionId() {
         return optionId;
     }
 
-    public void setOptionId(Long optionId) {
+    public void setOptionId(UUID optionId) {
         this.optionId = optionId;
     }
 
-    public Long getOptionResponseId() {
+    public UUID getOptionResponseId() {
         return optionResponseId;
     }
 
-    public void setOptionResponseId(Long optionResponseId) {
+    public void setOptionResponseId(UUID optionResponseId) {
         this.optionResponseId = optionResponseId;
     }
 

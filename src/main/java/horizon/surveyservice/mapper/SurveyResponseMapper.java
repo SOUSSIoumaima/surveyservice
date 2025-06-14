@@ -10,7 +10,6 @@ public class SurveyResponseMapper {
         SurveyResponseDto dto = new SurveyResponseDto();
         dto.setSurveyResponseId(entity.getSurveyResponseId());
         dto.setSurveyId(entity.getSurveyId());
-        dto.setRespondentId(entity.getRespondentId());
         dto.setSubmittedAt(entity.getSubmittedAt());
         dto.setTotalScore(entity.getTotalScore());
         dto.setQuestionResponses(
@@ -25,7 +24,6 @@ public class SurveyResponseMapper {
         SurveyResponse entity = new SurveyResponse();
         entity.setSurveyResponseId(dto.getSurveyResponseId());
         entity.setSurveyId(dto.getSurveyId());
-        entity.setRespondentId(dto.getRespondentId());
         entity.setSubmittedAt(dto.getSubmittedAt());
         entity.setTotalScore(dto.getTotalScore());
 

@@ -2,18 +2,21 @@ package horizon.surveyservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.ser.std.UUIDSerializer;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name= "questionResponse")
 public class QuestionResponse {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long questionResponseId;
-    private Long questionId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
+    private UUID questionResponseId;
+    private UUID questionId;
     @ManyToOne
     @JoinColumn(name= "surveyResponseId",referencedColumnName = "surveyResponseId")
     private SurveyResponse surveyResponse;
@@ -24,7 +27,7 @@ public class QuestionResponse {
     private Long questionScore;
     private LocalDateTime submittedAt;
 
-    public QuestionResponse(Long questionResponseId, LocalDateTime submittedAt, Long questionScore, List<OptionResponse> optionResponses, String questionText, Long questionId) {
+    public QuestionResponse(UUID questionResponseId, LocalDateTime submittedAt, Long questionScore, List<OptionResponse> optionResponses, String questionText, UUID questionId) {
         this.questionResponseId = questionResponseId;
         this.submittedAt = submittedAt;
         this.questionScore = questionScore;
@@ -74,19 +77,19 @@ public class QuestionResponse {
         this.questionText = questionText;
     }
 
-    public Long getQuestionId() {
+    public UUID getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(Long questionId) {
+    public void setQuestionId(UUID questionId) {
         this.questionId = questionId;
     }
 
-    public Long getQuestionResponseId() {
+    public UUID getQuestionResponseId() {
         return questionResponseId;
     }
 
-    public void setQuestionResponseId(Long questionResponseId) {
+    public void setQuestionResponseId(UUID questionResponseId) {
         this.questionResponseId = questionResponseId;
     }
 }

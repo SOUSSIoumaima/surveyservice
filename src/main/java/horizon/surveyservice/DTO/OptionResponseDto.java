@@ -1,15 +1,17 @@
 package horizon.surveyservice.DTO;
 
+import java.util.UUID;
+
 public class OptionResponseDto {
-    private Long optionResponseId;
-    private Long optionId;
-    private Long questionResponseId;
+    private UUID optionResponseId;
+    private UUID optionId;
+    private UUID questionResponseId;
     private String optionText;
     private boolean isCorrect;
     private boolean isSelected;
     private Long optionScore;
 
-    public OptionResponseDto(Long optionResponseId, Long optionId, String optionText, boolean isCorrect, boolean isSelected, Long optionScore) {
+    public OptionResponseDto(UUID optionResponseId, UUID optionId, String optionText, boolean isCorrect, boolean isSelected, Long optionScore) {
         this.optionResponseId = optionResponseId;
         this.optionId = optionId;
         this.optionText = optionText;
@@ -21,27 +23,27 @@ public class OptionResponseDto {
     public OptionResponseDto()
     {}
 
-    public Long getQuestionResponseId() {
+    public UUID getQuestionResponseId() {
         return questionResponseId;
     }
 
-    public void setQuestionResponseId(Long questionResponseId) {
+    public void setQuestionResponseId(UUID questionResponseId) {
         this.questionResponseId = questionResponseId;
     }
 
-    public Long getOptionResponseId() {
+    public UUID getOptionResponseId() {
         return optionResponseId;
     }
 
-    public void setOptionResponseId(Long optionResponseId) {
+    public void setOptionResponseId(UUID optionResponseId) {
         this.optionResponseId = optionResponseId;
     }
 
-    public Long getOptionId() {
+    public UUID getOptionId() {
         return optionId;
     }
 
-    public void setOptionId(Long optionId) {
+    public void setOptionId(UUID optionId) {
         this.optionId = optionId;
     }
 

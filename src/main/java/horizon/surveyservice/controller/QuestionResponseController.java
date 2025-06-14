@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/question-response")
@@ -25,25 +26,25 @@ public class QuestionResponseController {
         return ResponseEntity.ok(questionResponseService.getAllQuestionResponses());
     }
     @GetMapping("/{id}")
-    public ResponseEntity<QuestionResponseDto> getQuestionResponseById (@PathVariable Long id) {
+    public ResponseEntity<QuestionResponseDto> getQuestionResponseById (@PathVariable UUID id) {
         QuestionResponseDto responseDto = questionResponseService.getQuestionResponseById(id);
         return ResponseEntity.ok(responseDto);
     }
     @GetMapping("/bySurvey/{surveyResponseId}")
-    public ResponseEntity<?> getQuestionResponseBySurveyResponseId (@PathVariable Long surveyResponseId) {
+    public ResponseEntity<?> getQuestionResponseBySurveyResponseId (@PathVariable UUID surveyResponseId) {
         List<QuestionResponseDto> responses = questionResponseService.getQuestionResponseBySurveyResponseId(surveyResponseId);
         return ResponseEntity.ok(responses);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateQuestionResponse (@PathVariable Long id, @RequestBody QuestionResponseDto questionResponseDto) {
+    public ResponseEntity<?> updateQuestionResponse (@PathVariable UUID id, @RequestBody QuestionResponseDto questionResponseDto) {
         QuestionResponseDto response = questionResponseService.updateQuestionResponse(id, questionResponseDto);
         return ResponseEntity.ok(response);
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteQuestionResponse(@PathVariable Long id) {
+    public ResponseEntity<?> deleteQuestionResponse(@PathVariable UUID id) {
         questionResponseService.deleteQuestionResponse(id);
         List<QuestionResponseDto> responses = questionResponseService.getAllQuestionResponses();
         return ResponseEntity.ok(responses);

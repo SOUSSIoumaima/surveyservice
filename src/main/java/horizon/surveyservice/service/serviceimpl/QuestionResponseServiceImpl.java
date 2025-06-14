@@ -11,6 +11,7 @@ import horizon.surveyservice.service.QuestionResponseService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 @Service
 public class QuestionResponseServiceImpl implements QuestionResponseService {
@@ -30,7 +31,7 @@ public class QuestionResponseServiceImpl implements QuestionResponseService {
     }
 
     @Override
-    public QuestionResponseDto updateQuestionResponse(Long id, QuestionResponseDto questionResponseDto) {
+    public QuestionResponseDto updateQuestionResponse(UUID id, QuestionResponseDto questionResponseDto) {
         QuestionResponse existing = questionResponseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question Response Not Found with id " + id));
         existing.setQuestionScore(questionResponseDto.getQuestionScore());
@@ -39,14 +40,14 @@ public class QuestionResponseServiceImpl implements QuestionResponseService {
     }
 
     @Override
-    public QuestionResponseDto getQuestionResponseById(Long id) {
+    public QuestionResponseDto getQuestionResponseById(UUID id) {
         QuestionResponse questionResponse = questionResponseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question Response Not Found with id " + id));
         return QuestionResponseMapper.toDto(questionResponse);
     }
 
     @Override
-    public List<QuestionResponseDto> getQuestionResponseBySurveyResponseId(Long surveyResponseId) {
+    public List<QuestionResponseDto> getQuestionResponseBySurveyResponseId(UUID surveyResponseId) {
         List<QuestionResponse> questionResponses = questionResponseRepository.findBySurveyResponseSurveyResponseId(surveyResponseId);
         if (questionResponses.isEmpty()) {
             throw new ResourceNotFoundException("Question Response Not Found with id " + surveyResponseId);
@@ -65,7 +66,7 @@ public class QuestionResponseServiceImpl implements QuestionResponseService {
     }
 
     @Override
-    public void deleteQuestionResponse(Long id) {
+    public void deleteQuestionResponse(UUID id) {
         QuestionResponse existing = questionResponseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question Response Not Found with id " + id));
         questionResponseRepository.delete(existing);

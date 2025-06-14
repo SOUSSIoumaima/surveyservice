@@ -11,6 +11,7 @@ import horizon.surveyservice.service.OptionResponseService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 @Service
 public class OptionResponseServiceImpl implements OptionResponseService {
@@ -31,7 +32,7 @@ public class OptionResponseServiceImpl implements OptionResponseService {
     }
 
     @Override
-    public OptionResponseDto updateOptionResponse(Long id, OptionResponseDto optionResponseDto) {
+    public OptionResponseDto updateOptionResponse(UUID id, OptionResponseDto optionResponseDto) {
         OptionResponse existing = optionResponseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OptionResponse not found with id " + id));
         existing.setSelected(optionResponseDto.isSelected());
@@ -41,14 +42,14 @@ public class OptionResponseServiceImpl implements OptionResponseService {
     }
 
     @Override
-    public OptionResponseDto getOptionResponseById(Long id) {
+    public OptionResponseDto getOptionResponseById(UUID id) {
         OptionResponse optionResponse = optionResponseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OptionResponse not found with id " + id));
         return OptionResponseMapper.toDto(optionResponse);
     }
 
     @Override
-    public List<OptionResponseDto> getOptionResponseByQuestionResponseId(Long questionResponseId) {
+    public List<OptionResponseDto> getOptionResponseByQuestionResponseId(UUID questionResponseId) {
         List<OptionResponse> optionResponses = optionResponseRepository.findByQuestionResponseQuestionResponseId(questionResponseId);
         if (optionResponses.isEmpty()) {
             throw new ResourceNotFoundException("OptionResponse not found with id " + questionResponseId);
@@ -67,7 +68,7 @@ public class OptionResponseServiceImpl implements OptionResponseService {
     }
 
     @Override
-    public void deleteOptionResponse(Long id) {
+    public void deleteOptionResponse(UUID id) {
         OptionResponse existing = optionResponseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OptionResponse not found with id " + id));
         optionResponseRepository.delete(existing);

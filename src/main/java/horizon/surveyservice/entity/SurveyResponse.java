@@ -5,25 +5,26 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table
 public class SurveyResponse {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long surveyResponseId;
-    private Long surveyId;
-    private Long respondentId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
+    private UUID surveyResponseId;
+    private UUID surveyId;
+//    private UUID respondentId;
     @JsonBackReference
     @OneToMany(mappedBy = "surveyResponse", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<QuestionResponse> questionResponses;
     private LocalDateTime submittedAt;
     private Long totalScore;
 
-    public SurveyResponse(Long surveyResponseId, Long surveyId, Long respondentId, List<QuestionResponse> questionResponses, LocalDateTime submittedAt, Long totalScore) {
+    public SurveyResponse(UUID surveyResponseId, UUID surveyId, List<QuestionResponse> questionResponses, LocalDateTime submittedAt, Long totalScore) {
         this.surveyResponseId = surveyResponseId;
         this.surveyId = surveyId;
-        this.respondentId = respondentId;
         this.questionResponses = questionResponses;
         this.submittedAt = submittedAt;
         this.totalScore = totalScore;
@@ -31,29 +32,29 @@ public class SurveyResponse {
 
     public SurveyResponse() {}
 
-    public Long getSurveyResponseId() {
+    public UUID getSurveyResponseId() {
         return surveyResponseId;
     }
 
-    public void setSurveyResponseId(Long surveyResponseId) {
+    public void setSurveyResponseId(UUID surveyResponseId) {
         this.surveyResponseId = surveyResponseId;
     }
 
-    public Long getSurveyId() {
+    public UUID getSurveyId() {
         return surveyId;
     }
 
-    public void setSurveyId(Long surveyId) {
+    public void setSurveyId(UUID surveyId) {
         this.surveyId = surveyId;
     }
 
-    public Long getRespondentId() {
-        return respondentId;
-    }
+//    public UUID getRespondentId() {
+//        return respondentId;
+//    }
 
-    public void setRespondentId(Long respondentId) {
-        this.respondentId = respondentId;
-    }
+//    public void setRespondentId(UUID respondentId) {
+//        this.respondentId = respondentId;
+//    }
 
     public List<QuestionResponse> getQuestionResponses() {
         return questionResponses;

@@ -5,12 +5,13 @@ import horizon.surveyservice.DTO.QuestionResponseDto;
 
 
 import java.util.List;
+import java.util.UUID;
 
 public interface QuestionResponseService {
     QuestionResponseDto submitQuestionResponse(QuestionResponseDto questionResponseDto);
-    QuestionResponseDto updateQuestionResponse(Long id,QuestionResponseDto questionResponseDto);
-    QuestionResponseDto getQuestionResponseById(Long id);
-    List<QuestionResponseDto> getQuestionResponseBySurveyResponseId(Long surveyResponseId);
+    QuestionResponseDto updateQuestionResponse(UUID id, QuestionResponseDto questionResponseDto);
+    QuestionResponseDto getQuestionResponseById(UUID id);
+    List<QuestionResponseDto> getQuestionResponseBySurveyResponseId(UUID surveyResponseId);
     List<QuestionResponseDto> getAllQuestionResponses();
-    void deleteQuestionResponse(Long id);
+    void deleteQuestionResponse(UUID id);
 }

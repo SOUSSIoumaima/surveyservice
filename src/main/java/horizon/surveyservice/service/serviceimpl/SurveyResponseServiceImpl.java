@@ -10,6 +10,7 @@ import horizon.surveyservice.service.SurveyResponseService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 @Service
 public class SurveyResponseServiceImpl implements SurveyResponseService {
@@ -36,14 +37,14 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
     }
 
     @Override
-    public SurveyResponseDto getSurveyResponseById(Long surveyResponseId) {
+    public SurveyResponseDto getSurveyResponseById(UUID surveyResponseId) {
         SurveyResponse surveyResponse = surveyResponseRepository.findById(surveyResponseId)
                 .orElseThrow(()-> new ResourceNotFoundException("Survey Response Not Found with id: " + surveyResponseId));
         return SurveyResponseMapper.toDto(surveyResponse);
     }
 
     @Override
-    public SurveyResponseDto updateSurveyResponse(Long surveyResponseId, SurveyResponseDto surveyResponseDto) {
+    public SurveyResponseDto updateSurveyResponse(UUID surveyResponseId, SurveyResponseDto surveyResponseDto) {
         SurveyResponse existing= surveyResponseRepository.findById(surveyResponseId)
                 .orElseThrow(()-> new ResourceNotFoundException("Survey Response Not Found with id: " + surveyResponseId));
         existing.setSubmittedAt(surveyResponseDto.getSubmittedAt());
@@ -53,7 +54,7 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
     }
 
     @Override
-    public void deleteSurveyResponse(Long surveyResponseId) {
+    public void deleteSurveyResponse(UUID surveyResponseId) {
         SurveyResponse existing = surveyResponseRepository.findById(surveyResponseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey Response Not Found with id: " + surveyResponseId));
         surveyResponseRepository.delete(existing);

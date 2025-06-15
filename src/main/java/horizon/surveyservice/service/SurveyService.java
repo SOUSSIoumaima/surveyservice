@@ -16,4 +16,6 @@ public interface SurveyService {
     void unassignQuestionFromSurvey(UUID surveyId, UUID questionId);
     SurveyDto lockSurvey(UUID id);
     SurveyDto unlockSurvey(UUID id);
+    boolean exists(UUID id);
+
 }

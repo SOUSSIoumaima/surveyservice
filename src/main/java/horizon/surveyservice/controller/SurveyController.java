@@ -89,5 +89,10 @@ public class SurveyController {
     public ResponseEntity<SurveyDto> unlockSurvey(@PathVariable UUID id) {
         return ResponseEntity.ok(surveyService.unlockSurvey(id));
     }
+    @GetMapping("/{id}/exists")
+    public ResponseEntity< Boolean> exists(@PathVariable UUID id) {
+        boolean exists = surveyService.exists(id);
+        return ResponseEntity.ok(exists);
+    }
 
 }

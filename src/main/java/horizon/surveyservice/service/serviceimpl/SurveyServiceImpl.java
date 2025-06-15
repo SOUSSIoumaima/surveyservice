@@ -170,4 +170,7 @@ public class SurveyServiceImpl implements SurveyService {
         surveyRepository.save(survey);
         return SurveyMapper.toSurveyDto(survey);
     }
+    public boolean exists(UUID id) {
+        return surveyRepository.existsById(id);
+    }
 }

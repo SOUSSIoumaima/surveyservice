@@ -35,7 +35,13 @@ public class QuestionResponse {
         this.questionText = questionText;
         this.questionId = questionId;
     }
-    public QuestionResponse() {}
+    public QuestionResponse() {
+        this.submittedAt = LocalDateTime.now();
+    }
+    @PrePersist
+    protected void onCreate() {
+        this.submittedAt = LocalDateTime.now();
+    }
 
     public SurveyResponse getSurveyResponse() {
         return surveyResponse;

@@ -33,6 +33,8 @@ public class SurveyServiceImpl implements SurveyService {
     public SurveyDto createSurvey(SurveyDto surveyDto) {
         UUID currentOrgId = organizationContextUtil.getCurrentOrganizationId();
         surveyDto.setOrganizationId(currentOrgId);
+        UUID currentUserId = organizationContextUtil.getCurrentUserId();
+        surveyDto.setOwnerId(currentUserId);
         Survey survey = SurveyMapper.toSurveyEntity(surveyDto);
         Survey saved=surveyRepository.save(survey);
         return SurveyMapper.toSurveyDto(saved);

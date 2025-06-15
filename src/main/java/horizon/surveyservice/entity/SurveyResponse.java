@@ -30,7 +30,13 @@ public class SurveyResponse {
         this.totalScore = totalScore;
     }
 
-    public SurveyResponse() {}
+    public SurveyResponse() {
+        this.submittedAt = LocalDateTime.now();
+    }
+    @PrePersist
+    protected void onCreate() {
+        this.submittedAt = LocalDateTime.now();
+    }
 
     public UUID getSurveyResponseId() {
         return surveyResponseId;

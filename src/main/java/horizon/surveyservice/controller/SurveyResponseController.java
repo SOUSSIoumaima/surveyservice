@@ -1,6 +1,7 @@
 package horizon.surveyservice.controller;
 
 
+import horizon.surveyservice.DTO.QuestionResponseDto;
 import horizon.surveyservice.DTO.SurveyResponseDto;
 import horizon.surveyservice.service.SurveyResponseService;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,12 @@ public class SurveyResponseController {
 
     @PostMapping
     public ResponseEntity<SurveyResponseDto> submitSurveyResponse(@RequestBody SurveyResponseDto surveyResponseDto){
+        List<QuestionResponseDto> questionResponses = surveyResponseDto.getQuestionResponses();
+
+        long totalScore = questionResponses.stream()
+                .mapToLong(QuestionResponseDto::getQuestionScore)
+                .sum();
+        surveyResponseDto.setTotalScore(totalScore);
         SurveyResponseDto createdSurveyResponse = surveyResponseService.submitSurveyResponse(surveyResponseDto);
         return ResponseEntity.ok(createdSurveyResponse);
     }
@@ -34,6 +41,12 @@ public class SurveyResponseController {
 
     @PutMapping("/{id}")
     public ResponseEntity<SurveyResponseDto> updateSurveyResponse(@PathVariable UUID id, @RequestBody SurveyResponseDto surveyResponseDto){
+        List<QuestionResponseDto> questionResponses = surveyResponseDto.getQuestionResponses();
+
+        long totalScore = questionResponses.stream()
+                .mapToLong(QuestionResponseDto::getQuestionScore)
+                .sum();
+        surveyResponseDto.setTotalScore(totalScore);
         SurveyResponseDto updatedSurveyResponse = surveyResponseService.updateSurveyResponse(id, surveyResponseDto);
         return ResponseEntity.ok(updatedSurveyResponse);
     }

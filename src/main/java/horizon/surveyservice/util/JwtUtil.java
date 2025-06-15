@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.UUID;
-import java.util.function.Function;
 @Component
 public class JwtUtil {
     private final Key signingKey;
@@ -18,19 +17,22 @@ public class JwtUtil {
         this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
-    public UUID extractOrganizationId(String token) {
+
+    public UUID extractUUIDClaim(String token, String claimKey) {
         try {
             Claims claims = getAllClaimsFromToken(token);
-            String orgId = (String) claims.get("organizationId");
-            return orgId != null ? UUID.fromString(orgId) : null;
+            String value = (String) claims.get(claimKey);
+            return value != null ? UUID.fromString(value) : null;
         } catch (Exception e) {
             return null;
         }
     }
+    public UUID extractUserId(String token) {
+        return extractUUIDClaim(token, "userId");
+    }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
-        return claimsResolver.apply(claims);
+    public UUID extractOrganizationId(String token) {
+        return extractUUIDClaim(token, "organizationId");
     }
 
     public Claims getAllClaimsFromToken(String token) {

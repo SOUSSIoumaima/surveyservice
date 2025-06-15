@@ -15,7 +15,7 @@ public class Survey {
     private UUID surveyId;
     private UUID organizationId;
 
-//    private UUID ownerId;
+    private UUID ownerId;
     private SurveyType type;
     private String title;
     private String description;
@@ -71,13 +71,13 @@ public class Survey {
         this.surveyId = surveyId;
     }
 
-//    public UUID getOwnerId() {
-//        return ownerId;
-//    }
-//
-//    public void setOwnerId(UUID ownerId) {
-//        this.ownerId = ownerId;
-//    }
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(UUID ownerId) {
+        this.ownerId = ownerId;
+    }
 
     public SurveyType getType() {
         return type;

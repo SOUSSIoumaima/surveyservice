@@ -10,7 +10,6 @@ public interface SurveyService {
     List<SurveyDto> getAllSurveys();
     SurveyDto getSurveyById(UUID surveyId);
     List<SurveyDto> getSurveysByOrganization(UUID organizationId);
-
     SurveyDto updateSurvey(UUID surveyId, SurveyDto surveyDto);
     void deleteSurvey(UUID surveyId);
     void assignQuestionToSurvey(UUID surveyId, UUID questionId);

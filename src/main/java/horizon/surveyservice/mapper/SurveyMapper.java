@@ -18,6 +18,7 @@ public class SurveyMapper {
         dto.setOrganizationId(survey.getOrganizationId());
         dto.setType(survey.getType());
         dto.setTitle(survey.getTitle());
+        dto.setOwnerId(survey.getOwnerId());
         dto.setDescription(survey.getDescription());
         dto.setStatus(survey.getStatus());
         dto.setCreatedAt(survey.getCreatedAt());
@@ -43,6 +44,7 @@ public class SurveyMapper {
         survey.setOrganizationId(dto.getOrganizationId()); // ✅ Important
         survey.setType(dto.getType());
         survey.setTitle(dto.getTitle());
+        survey.setOwnerId(dto.getOwnerId());
         survey.setDescription(dto.getDescription());
         survey.setStatus(dto.getStatus());
         survey.setCreatedAt(dto.getCreatedAt());

@@ -1,5 +1,6 @@
 package horizon.surveyservice.controller;
 
+import horizon.surveyservice.DTO.OptionResponseDto;
 import horizon.surveyservice.DTO.QuestionResponseDto;
 import horizon.surveyservice.service.QuestionResponseService;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,11 @@ public class QuestionResponseController {
     }
     @PostMapping
     public ResponseEntity<QuestionResponseDto> submitQuestionResponse (@RequestBody QuestionResponseDto questionResponseDto) {
+        long questionScore = questionResponseDto.getOptionResponses().stream()
+                .filter(OptionResponseDto::isSelected)
+                .mapToLong(OptionResponseDto::getOptionScore)
+                .sum();
+        questionResponseDto.setQuestionScore(questionScore);
         QuestionResponseDto responseDto = questionResponseService.submitQuestionResponse(questionResponseDto);
         return ResponseEntity.ok(responseDto);
     }
@@ -38,6 +44,11 @@ public class QuestionResponseController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateQuestionResponse (@PathVariable UUID id, @RequestBody QuestionResponseDto questionResponseDto) {
+        long questionScore = questionResponseDto.getOptionResponses().stream()
+                .filter(OptionResponseDto::isSelected)
+                .mapToLong(OptionResponseDto::getOptionScore)
+                .sum();
+        questionResponseDto.setQuestionScore(questionScore);
         QuestionResponseDto response = questionResponseService.updateQuestionResponse(id, questionResponseDto);
         return ResponseEntity.ok(response);
     }

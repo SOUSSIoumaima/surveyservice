@@ -27,6 +27,15 @@ public class OrganizationContextUtil {
 
         return organizationId;
     }
+    public UUID getCurrentUserId() {
+        String token = extractTokenFromRequest();
+        if (token == null) throw new SecurityException("No token found");
+
+        UUID userId = jwtUtil.extractUserId(token);
+        if (userId == null) throw new SecurityException("No user ID found in token");
+
+        return userId;
+    }
 
     public void validateOrganizationAccess(UUID resourceOrganizationId) {
         if (isRootAdmin()) return;

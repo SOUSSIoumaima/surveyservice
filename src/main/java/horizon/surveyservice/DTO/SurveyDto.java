@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class SurveyDto {
     private UUID surveyId;
-//    private UUID ownerId;
+    private UUID ownerId;
     private UUID organizationId;
     private SurveyType type;
     private String title;
@@ -40,13 +40,13 @@ public class SurveyDto {
         this.surveyId = surveyId;
     }
 
-//    public UUID getOwnerId() {
-//        return ownerId;
-//    }
-//
-//    public void setOwnerId(UUID ownerId) {
-//        this.ownerId = ownerId;
-//    }
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(UUID ownerId) {
+        this.ownerId = ownerId;
+    }
 
     public SurveyType getType() {
         return type;

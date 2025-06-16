@@ -16,6 +16,8 @@ public interface QuestionService {
     QuestionDto lockQuestion(UUID id);
     QuestionDto unlockQuestion(UUID id);
     List<QuestionDto> getQuestionByOrganization(UUID organizationId);
+    List<QuestionDto> getBySubjectAndOrganization(String subject, UUID organizationId);
+
 
 
 }

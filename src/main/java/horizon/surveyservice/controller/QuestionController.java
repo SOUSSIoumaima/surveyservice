@@ -67,7 +67,12 @@ public class QuestionController {
     @GetMapping("/subject/{subject}")
     @PreAuthorize("hasAnyAuthority('QUESTION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<QuestionDto>> getBySubject(@PathVariable String subject) {
-        return ResponseEntity.ok(questionService.getBySubject(subject));
+        if (orgContextUtil.isRootAdmin()) {
+            return ResponseEntity.ok(questionService.getBySubject(subject));
+        } else {
+            UUID orgId = orgContextUtil.getCurrentOrganizationId();
+            return ResponseEntity.ok(questionService.getBySubjectAndOrganization(subject, orgId));
+        }
     }
     @PatchMapping("/{id}/lock")
     @PreAuthorize("hasAnyAuthority('QUESTION_LOCK','SYS_ADMIN_ROOT')")

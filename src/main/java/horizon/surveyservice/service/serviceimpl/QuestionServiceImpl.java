@@ -127,4 +127,12 @@ public class QuestionServiceImpl implements QuestionService {
                 .map(QuestionMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<QuestionDto> getBySubjectAndOrganization(String subject, UUID organizationId) {
+        List<Question> questions = questionRepository.findBySubjectAndOrganizationId(subject, organizationId);
+        return questions.stream()
+                .map(QuestionMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

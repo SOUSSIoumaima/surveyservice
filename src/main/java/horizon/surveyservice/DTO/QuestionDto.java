@@ -13,17 +13,27 @@ public class QuestionDto {
     private QuestionType questionType;
     private boolean locked;
     private List<OptionDto> options;
+    private UUID organizationId;
 
-    public QuestionDto(UUID questionId, String subject, String questionText, QuestionType questionType, boolean locked, List<OptionDto> options) {
+    public QuestionDto(UUID questionId, String subject, String questionText, QuestionType questionType, boolean locked, List<OptionDto> options, UUID organizationId) {
         this.questionId = questionId;
         this.subject = subject;
         this.questionText = questionText;
         this.questionType = questionType;
         this.locked = locked;
         this.options = options;
+        this.organizationId = organizationId;
     }
 
     public QuestionDto() {
+    }
+
+    public UUID getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(UUID organizationId) {
+        this.organizationId = organizationId;
     }
 
     public UUID getQuestionId() {

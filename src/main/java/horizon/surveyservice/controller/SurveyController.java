@@ -24,14 +24,14 @@ public class SurveyController {
 
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('PERMISSION_CREATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_CREATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<SurveyDto> createSurvey(@RequestBody SurveyDto surveyDto) {
         SurveyDto createdSurvey = surveyService.createSurvey(surveyDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSurvey);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('PERMISSION_READ','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<SurveyDto>> getAllSurveys() {
 
         if (orgContextUtil.isRootAdmin()) {
@@ -45,19 +45,19 @@ public class SurveyController {
     }
 
     @GetMapping("/{surveyId}")
-    @PreAuthorize("hasAnyAuthority('PERMISSION_READ','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<SurveyDto> getSurveyById(@PathVariable UUID surveyId) {
         return ResponseEntity.ok(surveyService.getSurveyById(surveyId));
     }
 
     @PutMapping("/{surveyId}")
-    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<SurveyDto> updateSurvey(@PathVariable UUID surveyId, @RequestBody SurveyDto surveyDto) {
         SurveyDto updatedSurvey = surveyService.updateSurvey(surveyId, surveyDto);
         return ResponseEntity.ok(updatedSurvey);
     }
     @DeleteMapping("/{surveyId}")
-    @PreAuthorize("hasAnyAuthority('PERMISSION_DELETE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_DELETE','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<SurveyDto>> deleteSurvey(@PathVariable UUID surveyId) {
         surveyService.deleteSurvey(surveyId);
         List<SurveyDto> surveys = surveyService.getAllSurveys();
@@ -65,27 +65,27 @@ public class SurveyController {
     }
 
     @PostMapping("/{surveyId}/question/{questionId}")
-    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<SurveyDto> assignQuestionToSurvey(@PathVariable UUID surveyId, @PathVariable UUID questionId) {
         surveyService.assignQuestionToSurvey(surveyId, questionId);
         return ResponseEntity.ok(surveyService.getSurveyById(surveyId));
     }
 
     @DeleteMapping("/{surveyId}/question/{questionId}")
-    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT')")
     public ResponseEntity<SurveyDto> unassignQuestionFromSurvey(@PathVariable UUID surveyId, @PathVariable UUID questionId) {
         surveyService.unassignQuestionFromSurvey(surveyId, questionId);
         return ResponseEntity.ok(surveyService.getSurveyById(surveyId));
     }
 
     @PatchMapping("/{id}/lock")
-    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_LOCK','SYS_ADMIN_ROOT')")
     public ResponseEntity<SurveyDto> lockSurvey(@PathVariable UUID id) {
         return ResponseEntity.ok(surveyService.lockSurvey(id));
     }
 
     @PatchMapping("/{id}/unlock")
-    @PreAuthorize("hasAnyAuthority('PERMISSION_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_UNLOCK','SYS_ADMIN_ROOT')")
     public ResponseEntity<SurveyDto> unlockSurvey(@PathVariable UUID id) {
         return ResponseEntity.ok(surveyService.unlockSurvey(id));
     }

@@ -41,7 +41,7 @@ public class SurveyMapper {
 
         Survey survey = new Survey();
         survey.setSurveyId(dto.getSurveyId());
-        survey.setOrganizationId(dto.getOrganizationId()); // ✅ Important
+        survey.setOrganizationId(dto.getOrganizationId());
         survey.setType(dto.getType());
         survey.setTitle(dto.getTitle());
         survey.setOwnerId(dto.getOwnerId());

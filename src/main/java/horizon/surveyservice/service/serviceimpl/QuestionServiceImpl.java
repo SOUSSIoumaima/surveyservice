@@ -7,6 +7,7 @@ import horizon.surveyservice.exeptions.ResourceNotFoundException;
 import horizon.surveyservice.mapper.QuestionMapper;
 import horizon.surveyservice.repository.QuestionRepository;
 import horizon.surveyservice.service.QuestionService;
+import horizon.surveyservice.util.OrganizationContextUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,13 +17,16 @@ import java.util.stream.Collectors;
 @Service
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
+    private final OrganizationContextUtil organizationContextUtil;
 
-    public QuestionServiceImpl(QuestionRepository questionRepository) {
-
+    public QuestionServiceImpl(QuestionRepository questionRepository, OrganizationContextUtil organizationContextUtil) {
+        this.organizationContextUtil = organizationContextUtil;
         this.questionRepository = questionRepository;
     }
     @Override
     public QuestionDto createQuestion(QuestionDto questionDto) {
+        UUID currentOrgId = organizationContextUtil.getCurrentOrganizationId();
+        questionDto.setOrganizationId(currentOrgId);
         Question question = QuestionMapper.toEntity(questionDto);
         Question saved = questionRepository.save(question);
         return QuestionMapper.toDTO(saved);
@@ -30,9 +34,17 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<QuestionDto> getAllQuestions() {
-        return questionRepository.findAll().stream()
-                .map(QuestionMapper::toDTO)
-                .collect(Collectors.toList());
+        List<Question> questions = questionRepository.findAll();
+        return questions.stream()
+                .filter(q->{
+                    try{
+                        organizationContextUtil.validateOrganizationAccess(q.getOrganizationId());
+                        return true;
+                    }catch (Exception e){
+                        return false;
+                    }
+                }).map(QuestionMapper::toDTO).collect(Collectors.toList());
+
 
     }
 
@@ -40,6 +52,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionDto getQuestionById(UUID id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:"+id));
+        organizationContextUtil.validateOrganizationAccess(question.getOrganizationId());
         return QuestionMapper.toDTO(question);
 
     }
@@ -50,6 +63,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionDto updateQuestion(UUID id,QuestionDto questionDto) {
         Question existing = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:"+id));
+        organizationContextUtil.validateOrganizationAccess(existing.getOrganizationId());
         if (existing.isLocked()){
             throw new LockedException("Question is locked cannot be updated");
         }
@@ -78,6 +92,7 @@ public class QuestionServiceImpl implements QuestionService {
     public void deleteQuestion(UUID id) {
         Question existing = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:" + id));
+        organizationContextUtil.validateOrganizationAccess(existing.getOrganizationId());
         if (existing.isLocked()) {
             throw new LockedException("Cannot delete a locked question with id: " + id);
         }
@@ -89,6 +104,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionDto lockQuestion(UUID id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:"+id));
+        organizationContextUtil.validateOrganizationAccess(question.getOrganizationId());
         question.setLocked(true);
         Question saved = questionRepository.save(question);
         return QuestionMapper.toDTO(saved);
@@ -98,8 +114,17 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionDto unlockQuestion(UUID id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id:"+id));
+        organizationContextUtil.validateOrganizationAccess(question.getOrganizationId());
         question.setLocked(false);
         Question saved = questionRepository.save(question);
         return QuestionMapper.toDTO(saved);
+    }
+
+    @Override
+    public List<QuestionDto> getQuestionByOrganization(UUID organizationId) {
+        List<Question> questions = questionRepository.findByOrganizationId(organizationId);
+        return questions.stream()
+                .map(QuestionMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

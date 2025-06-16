@@ -27,17 +27,29 @@ public class Question {
     private List<Option> options;
 
     private boolean locked;
+    @Column(nullable = false)
+    private UUID organizationId;
 
-    public Question(UUID questionId, String subject, String questionText, QuestionType questionType, List<Option> options, boolean locked) {
+    public Question(UUID questionId, String subject, String questionText, QuestionType questionType, List<Option> options, boolean locked, UUID organizationId) {
         this.questionId = questionId;
         this.subject = subject;
         this.questionText = questionText;
         this.questionType = questionType;
         this.options = options;
         this.locked = locked;
+        this.organizationId = organizationId;
     }
 
+
     public Question() {
+    }
+
+    public UUID getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(UUID organizationId) {
+        this.organizationId = organizationId;
     }
 
     public boolean isLocked() {

@@ -15,7 +15,9 @@ public class QuestionMapper {
         questionDto.setQuestionText(question.getQuestionText());
         questionDto.setQuestionType(question.getQuestionType());
         questionDto.setSubject(question.getSubject());
-        questionDto.setLocked(question.isLocked());
+
+        questionDto.setOrganizationId(question.getOrganizationId());
+
         if (question.getOptions() != null) {
             questionDto.setOptions(question.getOptions().stream().map(OptionMapper::toDto).collect(Collectors.toList()));
 
@@ -29,7 +31,8 @@ public class QuestionMapper {
         question.setQuestionText(questionDto.getQuestionText());
         question.setQuestionType(questionDto.getQuestionType());
         question.setSubject(questionDto.getSubject());
-        question.setLocked(questionDto.isLocked());
+        question.setOrganizationId(questionDto.getOrganizationId());
+
         if (questionDto.getOptions() != null) {
             List<Option> options = questionDto.getOptions()
                     .stream()

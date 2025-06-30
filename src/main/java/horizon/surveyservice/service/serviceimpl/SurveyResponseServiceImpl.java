@@ -24,6 +24,17 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
     @Override
     public SurveyResponseDto submitSurveyResponse(SurveyResponseDto surveyResponseDto) {
         SurveyResponse surveyResponse = SurveyResponseMapper.toEntity(surveyResponseDto);
+        if (surveyResponse.getQuestionResponses() != null) {
+            surveyResponse.getQuestionResponses().forEach(questionResponse -> {
+                questionResponse.setSurveyResponse(surveyResponse);
+
+                if (questionResponse.getOptionResponses() != null) {
+                    questionResponse.getOptionResponses().forEach(optionResponse -> {
+                        optionResponse.setQuestionResponse(questionResponse);
+                    });
+                }
+            });
+        }
         SurveyResponse saved = surveyResponseRepository.save(surveyResponse);
         return SurveyResponseMapper.toDto(saved);
     }

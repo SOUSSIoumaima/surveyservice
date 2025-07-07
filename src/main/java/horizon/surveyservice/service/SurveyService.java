@@ -12,7 +12,7 @@ public interface SurveyService {
     List<SurveyDto> getSurveysByOrganization(UUID organizationId);
     SurveyDto updateSurvey(UUID surveyId, SurveyDto surveyDto);
     void deleteSurvey(UUID surveyId);
-    void assignQuestionToSurvey(UUID surveyId, UUID questionId);
+    void assignQuestionToSurvey(UUID surveyId, UUID questionId, UUID departmentId, UUID teamId);
     void unassignQuestionFromSurvey(UUID surveyId, UUID questionId);
     SurveyDto lockSurvey(UUID id);
     SurveyDto unlockSurvey(UUID id);

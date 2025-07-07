@@ -1,12 +1,11 @@
-# build avec Maven
-FROM maven:3.9.4-eclipse-temurin-17 AS builder
+
+FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
-# image d'exécution avec JDK
-FROM eclipse-temurin:17-jdk
+FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

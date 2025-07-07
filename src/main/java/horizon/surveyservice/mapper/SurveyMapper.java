@@ -1,5 +1,6 @@
 package horizon.surveyservice.mapper;
 
+import horizon.surveyservice.DTO.AssignedQuestionDto;
 import horizon.surveyservice.DTO.QuestionDto;
 import horizon.surveyservice.DTO.SurveyDto;
 import horizon.surveyservice.entity.Question;
@@ -26,11 +27,11 @@ public class SurveyMapper {
         dto.setDeadline(survey.getDeadline());
         dto.setLocked(survey.isLocked());
 
-        if (survey.getQuestions() != null && !survey.getQuestions().isEmpty()) {
-            List<QuestionDto> questionsDto = survey.getQuestions().stream()
-                    .map(QuestionMapper::toDTO)
+        if (survey.getAssignedQuestions() != null && !survey.getAssignedQuestions().isEmpty()) {
+            List<AssignedQuestionDto> assignedQuestionDtos = survey.getAssignedQuestions().stream()
+                    .map(AssignedQuestionMapper::toDto)
                     .collect(Collectors.toList());
-            dto.setQuestions(questionsDto);
+            dto.setAssignedQuestions(assignedQuestionDtos);
         }
 
         return dto;
@@ -52,12 +53,8 @@ public class SurveyMapper {
         survey.setDeadline(dto.getDeadline());
         survey.setLocked(dto.isLocked());
 
-        if (dto.getQuestions() != null && !dto.getQuestions().isEmpty()) {
-            List<Question> questions = dto.getQuestions().stream()
-                    .map(QuestionMapper::toEntity)
-                    .collect(Collectors.toList());
-            survey.setQuestions(questions);
-        }
+        // ⚠️ NE PAS RÉ-AFFECTER LES questions directement
+        // La relation AssignedQuestion est gérée ailleurs (via AssignedQuestionService)
 
         return survey;
     }

@@ -25,13 +25,9 @@ public class Survey {
     private LocalDateTime updatedAt;
     private LocalDateTime deadline;
     private boolean locked;
-    @ManyToMany
-    @JoinTable(
-            name = "questions",
-            joinColumns = @JoinColumn(name = "surveyId"),
-            inverseJoinColumns = @JoinColumn(name = "questionId")
-    )
-    private List<Question> questions;
+
+    @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AssignedQuestion> assignedQuestions;
 
     public Survey() {
         this.createdAt = LocalDateTime.now();
@@ -143,11 +139,11 @@ public class Survey {
         this.locked = locked;
     }
 
-    public List<Question> getQuestions() {
-        return questions;
+    public List<AssignedQuestion> getAssignedQuestions() {
+        return assignedQuestions;
     }
 
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
+    public void setAssignedQuestions(List<AssignedQuestion> assignedQuestions) {
+        this.assignedQuestions = assignedQuestions;
     }
 }

@@ -34,6 +34,13 @@ public class JwtUtil {
     public UUID extractOrganizationId(String token) {
         return extractUUIDClaim(token, "organizationId");
     }
+    public UUID extractDepartmentId(String token) {
+        return extractUUIDClaim(token, "departmentId");
+    }
+
+    public UUID extractTeamId(String token) {
+        return extractUUIDClaim(token, "teamId");
+    }
 
     public Claims getAllClaimsFromToken(String token) {
         return Jwts.parserBuilder()

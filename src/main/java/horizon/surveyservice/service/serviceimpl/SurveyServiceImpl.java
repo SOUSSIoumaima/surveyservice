@@ -8,6 +8,7 @@ import horizon.surveyservice.exeptions.LockedException;
 import horizon.surveyservice.mapper.SurveyMapper;
 import horizon.surveyservice.repository.QuestionRepository;
 import horizon.surveyservice.repository.SurveyRepository;
+import horizon.surveyservice.service.AssignedQuestionService;
 import horizon.surveyservice.service.SurveyService;
 import horizon.surveyservice.util.OrganizationContextUtil;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,14 @@ public class SurveyServiceImpl implements SurveyService {
     private final SurveyRepository surveyRepository;
     private final QuestionRepository questionRepository;
     private final OrganizationContextUtil organizationContextUtil;
+    private final AssignedQuestionService assignedQuestionService;
 
-
-    public SurveyServiceImpl(SurveyRepository surveyRepository, QuestionRepository questionRepository, OrganizationContextUtil organizationContextUtil) {
+    public SurveyServiceImpl(SurveyRepository surveyRepository, QuestionRepository questionRepository, OrganizationContextUtil organizationContextUtil,AssignedQuestionService assignedQuestionService)
+    {
         this.organizationContextUtil = organizationContextUtil;
         this.surveyRepository = surveyRepository;
         this.questionRepository = questionRepository;
+        this.assignedQuestionService = assignedQuestionService;
     }
     @Override
     public SurveyDto createSurvey(SurveyDto surveyDto) {
@@ -97,7 +100,7 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void assignQuestionToSurvey(UUID surveyId, UUID questionId) {
+    public void assignQuestionToSurvey(UUID surveyId, UUID questionId, UUID departmentId, UUID teamId) {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
@@ -110,12 +113,8 @@ public class SurveyServiceImpl implements SurveyService {
         if (question.isLocked()) {
             throw new LockedException("Question is locked and cannot be modified");
         }
-        List<Question> questions = survey.getQuestions();
-        if (!questions.contains(question)) {
-            questions.add(question);
-            survey.setQuestions(questions);
-            surveyRepository.save(survey);
-        }
+        assignedQuestionService.assignQuestionToSurvey(surveyId, questionId, departmentId, teamId);
+
     }
 
     @Override
@@ -123,22 +122,18 @@ public class SurveyServiceImpl implements SurveyService {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+
         if (survey.isLocked()) {
             throw new LockedException("Survey is locked and cannot be modified");
         }
+
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + questionId));
         if (question.isLocked()) {
             throw new LockedException("Question is locked and cannot be modified");
         }
 
-        List<Question> questions = survey.getQuestions();
-        if (questions.contains(question)) {
-            questions.remove(question);
-            survey.setQuestions(questions);
-            surveyRepository.save(survey);
-        }
-
+        assignedQuestionService.unassignQuestionFromSurvey(surveyId, questionId);
     }
     @Override
     public List<SurveyDto> getSurveysByOrganization(UUID organizationId) {

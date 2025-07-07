@@ -3,7 +3,9 @@ package horizon.surveyservice.controller;
 import horizon.surveyservice.DTO.SurveyDto;
 
 import horizon.surveyservice.service.SurveyService;
+import horizon.surveyservice.util.JwtUtil;
 import horizon.surveyservice.util.OrganizationContextUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,9 +19,11 @@ import java.util.UUID;
 public class SurveyController {
     private final SurveyService surveyService;
     private final OrganizationContextUtil orgContextUtil;
-    public SurveyController(SurveyService surveyService, OrganizationContextUtil orgContextUtil) {
+    private final JwtUtil jwtUtil;
+    public SurveyController(SurveyService surveyService, OrganizationContextUtil orgContextUtil, JwtUtil jwtUtil) {
         this.surveyService = surveyService;
         this.orgContextUtil = orgContextUtil;
+        this.jwtUtil = jwtUtil;
     }
 
 
@@ -66,8 +70,18 @@ public class SurveyController {
 
     @PostMapping("/{surveyId}/question/{questionId}")
     @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT')")
-    public ResponseEntity<SurveyDto> assignQuestionToSurvey(@PathVariable UUID surveyId, @PathVariable UUID questionId) {
-        surveyService.assignQuestionToSurvey(surveyId, questionId);
+    public ResponseEntity<SurveyDto> assignQuestionToSurvey(@PathVariable UUID surveyId,
+                                                            @PathVariable UUID questionId,
+                                                            HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UUID departmentId = jwtUtil.extractDepartmentId(token);
+        UUID teamId = jwtUtil.extractTeamId(token);
+
+        surveyService.assignQuestionToSurvey(surveyId, questionId, departmentId, teamId);
         return ResponseEntity.ok(surveyService.getSurveyById(surveyId));
     }
 

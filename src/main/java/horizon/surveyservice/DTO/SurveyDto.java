@@ -20,7 +20,7 @@ public class SurveyDto {
     private LocalDateTime updatedAt;
     private LocalDateTime deadline;
     private boolean locked;
-    private List<QuestionDto> questions;
+    private List<AssignedQuestionDto> assignedQuestions;
 
     public SurveyDto() {}
 
@@ -112,11 +112,11 @@ public class SurveyDto {
         this.locked = locked;
     }
 
-    public List<QuestionDto> getQuestions() {
-        return questions;
+    public List<AssignedQuestionDto> getAssignedQuestions() {
+        return assignedQuestions;
     }
 
-    public void setQuestions(List<QuestionDto> questions) {
-        this.questions = questions;
+    public void setAssignedQuestions(List<AssignedQuestionDto> assignedQuestions) {
+        this.assignedQuestions = assignedQuestions;
     }
 }

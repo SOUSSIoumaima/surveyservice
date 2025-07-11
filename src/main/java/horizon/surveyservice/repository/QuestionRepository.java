@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface QuestionRepository extends JpaRepository<Question, UUID> {
-    List<Question> findBySubject(String subject);
+    List<Question> findBySubjectContainingIgnoreCase(String subject);
     List<Question> findByOrganizationId(UUID organizationId);
-    List<Question> findBySubjectAndOrganizationId(String subject, UUID organizationId);
+    List<Question> findBySubjectContainingIgnoreCaseAndOrganizationId(String subject, UUID organizationId);
 
 
 

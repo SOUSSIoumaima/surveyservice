@@ -78,11 +78,16 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<QuestionDto> getBySubject(String subject) {
-        List<Question> question = questionRepository.findBySubject(subject);
-        if (question.isEmpty()) {
-            throw new ResourceNotFoundException("Question not found with subject:"+subject);
-        }
-        return question.stream()
+        List<Question> questions = questionRepository.findBySubjectContainingIgnoreCase(subject);
+        return questions.stream()
+                .filter(q -> {
+                    try {
+                        organizationContextUtil.validateOrganizationAccess(q.getOrganizationId());
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
                 .map(QuestionMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -130,7 +135,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<QuestionDto> getBySubjectAndOrganization(String subject, UUID organizationId) {
-        List<Question> questions = questionRepository.findBySubjectAndOrganizationId(subject, organizationId);
+        List<Question> questions = questionRepository.findBySubjectContainingIgnoreCaseAndOrganizationId(subject, organizationId);
         return questions.stream()
                 .map(QuestionMapper::toDTO)
                 .collect(Collectors.toList());

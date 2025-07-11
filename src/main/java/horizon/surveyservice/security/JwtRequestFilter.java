@@ -1,5 +1,6 @@
 package horizon.surveyservice.security;
 
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -47,16 +48,29 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
+        String token = null;
         final String authorizationHeader = request.getHeader("Authorization");
 
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
+        // 1. Check Authorization header
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+        } else if (request.getCookies() != null) {
+            // 2. Otherwise, check cookies
+            for (Cookie cookie : request.getCookies()) {
+                if ("access_token".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // 3. If no token found → error
+        if (token == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid authentication token");
             return;
         }
 
         try {
-            final String token = authorizationHeader.substring(7);
-
             if (!jwtTokenUtil.isTokenValid(token)) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT token");
                 return;

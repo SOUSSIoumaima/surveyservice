@@ -48,21 +48,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = null;
         final String authorizationHeader = request.getHeader("Authorization");
 
-        // 1. Check Authorization header
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        } else if (request.getCookies() != null) {
-            // 2. Otherwise, check cookies
-            for (Cookie cookie : request.getCookies()) {
-                if ("access_token".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
-                }
-            }
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header");
+            return;
         }
+
+        final String token = authorizationHeader.substring(7);
 
         // 3. If no token found → error
         if (token == null) {

@@ -1,7 +1,6 @@
 package horizon.surveyservice.controller;
 
 import horizon.surveyservice.DTO.QuestionDto;
-import horizon.surveyservice.exeptions.ResourceNotFoundException;
 import horizon.surveyservice.service.QuestionService;
 
 import horizon.surveyservice.util.OrganizationContextUtil;
@@ -21,8 +20,8 @@ public class QuestionController {
     private final OrganizationContextUtil orgContextUtil;
 
     public QuestionController(QuestionService questionService, OrganizationContextUtil orgContextUtil) {
-        this.orgContextUtil = orgContextUtil;
         this.questionService = questionService;
+        this.orgContextUtil = orgContextUtil;
     }
 
     @PostMapping
@@ -35,35 +34,35 @@ public class QuestionController {
     @GetMapping
     @PreAuthorize("hasAnyAuthority('QUESTION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<QuestionDto>> getAllQuestions() {
-        if (orgContextUtil.isRootAdmin()){
+        if (orgContextUtil.isRootAdmin()) {
             return ResponseEntity.ok(questionService.getAllQuestions());
-        }else {
-            UUID organizationId= orgContextUtil.getCurrentOrganizationId();
+        } else {
+            UUID organizationId = orgContextUtil.getCurrentOrganizationId();
             List<QuestionDto> questions = questionService.getQuestionByOrganization(organizationId);
             return ResponseEntity.ok(questions);
         }
     }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('QUESTION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<QuestionDto> getQuestionById(@PathVariable UUID id) {
-        QuestionDto question = questionService.getQuestionById(id);
-        return ResponseEntity.ok(question);
+        return ResponseEntity.ok(questionService.getQuestionById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('QUESTION_UPDATE','SYS_ADMIN_ROOT')")
-    public ResponseEntity<?> updateQuestion(@PathVariable UUID id, @RequestBody QuestionDto questionDto) {
+    public ResponseEntity<QuestionDto> updateQuestion(@PathVariable UUID id, @RequestBody QuestionDto questionDto) {
         QuestionDto updated = questionService.updateQuestion(id, questionDto);
         return ResponseEntity.ok(updated);
     }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('QUESTION_DELETE','SYS_ADMIN_ROOT')")
-    public ResponseEntity<?> deleteQuestion(@PathVariable UUID id) {
+    public ResponseEntity<List<QuestionDto>> deleteQuestion(@PathVariable UUID id) {
         questionService.deleteQuestion(id);
-        List<QuestionDto> questions = questionService.getAllQuestions();
-        return ResponseEntity.ok(questions);
-
+        return ResponseEntity.ok(questionService.getAllQuestions());
     }
+
     @GetMapping("/subject/{subject}")
     @PreAuthorize("hasAnyAuthority('QUESTION_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<QuestionDto>> getBySubject(@PathVariable String subject) {
@@ -74,25 +73,18 @@ public class QuestionController {
             return ResponseEntity.ok(questionService.getBySubjectAndOrganization(subject, orgId));
         }
     }
+
     @PatchMapping("/{id}/lock")
     @PreAuthorize("hasAnyAuthority('QUESTION_LOCK','SYS_ADMIN_ROOT')")
-    public ResponseEntity<?> lockQuestion(@PathVariable UUID id) {
-        try {
-            return ResponseEntity.ok(questionService.lockQuestion(id));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Question not found");
-        }
+    public ResponseEntity<QuestionDto> lockQuestion(@PathVariable UUID id) {
+        QuestionDto locked = questionService.lockQuestion(id);
+        return ResponseEntity.ok(locked);
     }
 
     @PatchMapping("/{id}/unlock")
     @PreAuthorize("hasAnyAuthority('QUESTION_UNLOCK','SYS_ADMIN_ROOT')")
-    public ResponseEntity<?> unlockQuestion(@PathVariable UUID id) {
-        try {
-            return ResponseEntity.ok(questionService.unlockQuestion(id));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Question not found");
-        }
+    public ResponseEntity<QuestionDto> unlockQuestion(@PathVariable UUID id) {
+        QuestionDto unlocked = questionService.unlockQuestion(id);
+        return ResponseEntity.ok(unlocked);
     }
-
-
 }

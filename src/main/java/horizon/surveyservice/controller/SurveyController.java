@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/survey")
+@RequestMapping("/api/surveys")
 public class SurveyController {
     private final SurveyService surveyService;
     private final OrganizationContextUtil orgContextUtil;

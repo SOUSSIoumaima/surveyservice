@@ -2,8 +2,7 @@ package horizon.surveyservice.controller;
 
 import horizon.surveyservice.DTO.AssignedQuestionDto;
 import horizon.surveyservice.service.AssignedQuestionService;
-import horizon.surveyservice.util.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,12 +15,11 @@ import java.util.UUID;
 @RequestMapping("/api/assigned-question")
 public class AssignedQuestionController {
     private final AssignedQuestionService assignedQuestionService;
-    private final JwtUtil jwtUtil;
-    public AssignedQuestionController(AssignedQuestionService assignedQuestionService, JwtUtil jwtUtil) {
-        this.assignedQuestionService = assignedQuestionService;
-        this.jwtUtil = jwtUtil;
 
+    public AssignedQuestionController(AssignedQuestionService assignedQuestionService) {
+        this.assignedQuestionService = assignedQuestionService;
     }
+
     @DeleteMapping("/unassign")
     @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE', 'SYS_ADMIN_ROOT')")
     public ResponseEntity<Void> unassignQuestionFromSurvey(
@@ -30,21 +28,14 @@ public class AssignedQuestionController {
         assignedQuestionService.unassignQuestionFromSurvey(surveyId, questionId);
         return ResponseEntity.noContent().build();
     }
+
     @PostMapping("/assign")
     @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE', 'SYS_ADMIN_ROOT')")
     public ResponseEntity<AssignedQuestionDto> assignQuestionToSurvey(
             @RequestParam UUID surveyId,
             @RequestParam UUID questionId,
-            HttpServletRequest request) {
-
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        String token = authHeader.substring(7); // enlève "Bearer "
-
-        UUID departmentId = jwtUtil.extractDepartmentId(token);
-        UUID teamId = jwtUtil.extractTeamId(token);
+            @RequestHeader(value = "X-Department-Id", required = false) UUID departmentId,
+            @RequestHeader(value = "X-Team-Id", required = false) UUID teamId) {
 
         AssignedQuestionDto assignedQuestion = assignedQuestionService.assignQuestionToSurvey(
                 surveyId, questionId, departmentId, teamId
@@ -52,7 +43,6 @@ public class AssignedQuestionController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(assignedQuestion);
     }
-
 
     @GetMapping("/survey/{surveyId}")
     @PreAuthorize("hasAnyAuthority('SURVEY_READ', 'SYS_ADMIN_ROOT')")

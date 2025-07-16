@@ -12,29 +12,35 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.UUID;
 @Component
 public class OrganizationContextUtil {
-    private final JwtUtil jwtUtil;
+    private static final String HEADER_ORGANIZATION_ID = "X-Organization-Id";
+    private static final String HEADER_USER_ID = "X-User-Id";
+    private static final String HEADER_ROLES = "X-User-Roles";
+    private static final String HEADER_DEPARTMENT_ID = "X-Department-Id";
+    private static final String HEADER_TEAM_ID = "X-Team-Id";
 
-    public OrganizationContextUtil(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
 
     public UUID getCurrentOrganizationId() {
-        String token = extractTokenFromRequest();
-        if (token == null) throw new SecurityException("No token found");
-
-        UUID organizationId = jwtUtil.extractOrganizationId(token);
-        if (organizationId == null) throw new SecurityException("No organization ID found in token");
-
-        return organizationId;
+        String orgIdStr = getHeaderValue(HEADER_ORGANIZATION_ID);
+        if (orgIdStr == null) throw new SecurityException("No Organization ID found in headers");
+        return UUID.fromString(orgIdStr);
     }
+
     public UUID getCurrentUserId() {
-        String token = extractTokenFromRequest();
-        if (token == null) throw new SecurityException("No token found");
+        String userIdStr = getHeaderValue(HEADER_USER_ID);
+        if (userIdStr == null) throw new SecurityException("No User ID found in headers");
+        return UUID.fromString(userIdStr);
+    }
 
-        UUID userId = jwtUtil.extractUserId(token);
-        if (userId == null) throw new SecurityException("No user ID found in token");
-
-        return userId;
+    public boolean isRootAdmin() {
+        String rolesStr = getHeaderValue(HEADER_ROLES);
+        if (rolesStr == null) return false;
+        String[] roles = rolesStr.split(",");
+        for (String role : roles) {
+            if (role.trim().equals("SYS_ADMIN_ROOT")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void validateOrganizationAccess(UUID resourceOrganizationId) {
@@ -46,23 +52,21 @@ public class OrganizationContextUtil {
         }
     }
 
-    public boolean isRootAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(auth -> auth.equals("SYS_ADMIN_ROOT"));
-    }
-
-    private String extractTokenFromRequest() {
+    private String getHeaderValue(String headerName) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) return null;
-
         HttpServletRequest request = attributes.getRequest();
-        String header = request.getHeader("Authorization");
-
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
-        }
-        return null;
+        return request.getHeader(headerName);
     }
+
+    public UUID getCurrentDepartmentIdOrNull() {
+        String departmentIdStr = getHeaderValue(HEADER_DEPARTMENT_ID);
+        return (departmentIdStr != null && !departmentIdStr.isBlank()) ? UUID.fromString(departmentIdStr) : null;
+    }
+
+    public UUID getCurrentTeamIdOrNull() {
+        String teamIdStr = getHeaderValue(HEADER_TEAM_ID);
+        return (teamIdStr != null && !teamIdStr.isBlank()) ? UUID.fromString(teamIdStr) : null;
+    }
+
 }

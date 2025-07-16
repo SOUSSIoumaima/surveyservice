@@ -100,7 +100,7 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void assignQuestionToSurvey(UUID surveyId, UUID questionId, UUID departmentId, UUID teamId) {
+    public void assignQuestionToSurvey(UUID surveyId, UUID questionId, UUID ignoredDepartmentId, UUID ignoredTeamId) {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
@@ -108,13 +108,17 @@ public class SurveyServiceImpl implements SurveyService {
         if (survey.isLocked()) {
             throw new LockedException("Survey is locked and cannot be modified");
         }
+
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + questionId));
         if (question.isLocked()) {
             throw new LockedException("Question is locked and cannot be modified");
         }
-        assignedQuestionService.assignQuestionToSurvey(surveyId, questionId, departmentId, teamId);
 
+        UUID departmentId = organizationContextUtil.getCurrentDepartmentIdOrNull();
+        UUID teamId = organizationContextUtil.getCurrentTeamIdOrNull();
+
+        assignedQuestionService.assignQuestionToSurvey(surveyId, questionId, departmentId, teamId);
     }
 
     @Override

@@ -11,6 +11,7 @@ import horizon.surveyservice.repository.SurveyRepository;
 import horizon.surveyservice.service.AssignedQuestionService;
 import horizon.surveyservice.service.SurveyService;
 import horizon.surveyservice.util.OrganizationContextUtil;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -71,32 +72,56 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public SurveyDto updateSurvey(UUID surveyId, SurveyDto surveyDto) {
         Survey existing = surveyRepository.findById(surveyId)
-                .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + surveyId));
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
+
         organizationContextUtil.validateOrganizationAccess(existing.getOrganizationId());
 
-        if (existing.isLocked()){
-            throw new LockedException("Survey is locked cannot be updated");
+        UUID currentUserId = organizationContextUtil.getCurrentUserId();
+
+        boolean isOwner = existing.getOwnerId().equals(currentUserId);
+        boolean isRootAdmin = organizationContextUtil.isRootAdmin();
+        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
+
+        if (!(isOwner || isRootAdmin || isOrgManager)) {
+            throw new AccessDeniedException("Only the owner, ORG_MANAGER, or SYS_ADMIN_ROOT can update this survey.");
         }
+
+        if (existing.isLocked()) {
+            throw new LockedException("Survey is locked and cannot be updated");
+        }
+
         existing.setTitle(surveyDto.getTitle());
         existing.setDescription(surveyDto.getDescription());
         existing.setStatus(surveyDto.getStatus());
         existing.setDeadline(surveyDto.getDeadline());
         existing.setType(surveyDto.getType());
-        Survey updated=surveyRepository.save(existing);
+
+        Survey updated = surveyRepository.save(existing);
         return SurveyMapper.toSurveyDto(updated);
     }
 
     @Override
     public void deleteSurvey(UUID surveyId) {
         Survey existing = surveyRepository.findById(surveyId)
-                .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + surveyId));
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
+
         organizationContextUtil.validateOrganizationAccess(existing.getOrganizationId());
+
+        UUID currentUserId = organizationContextUtil.getCurrentUserId();
+
+        boolean isOwner = existing.getOwnerId().equals(currentUserId);
+        boolean isRootAdmin = organizationContextUtil.isRootAdmin();
+        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
+
+        if (!(isOwner || isRootAdmin || isOrgManager)) {
+            throw new AccessDeniedException("Only the owner, ORG_MANAGER, or SYS_ADMIN_ROOT can delete this survey.");
+        }
 
         if (existing.isLocked()) {
             throw new LockedException("Survey is locked and cannot be deleted");
         }
-        surveyRepository.delete(existing);
 
+        surveyRepository.delete(existing);
     }
 
     @Override
@@ -105,15 +130,24 @@ public class SurveyServiceImpl implements SurveyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
 
+        UUID currentUserId = organizationContextUtil.getCurrentUserId();
+
+        boolean isOwner = survey.getOwnerId().equals(currentUserId);
+        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
+        boolean isDepartmentManager = organizationContextUtil.hasRole("DEPARTMENT_MANAGER");
+        boolean isTeamManager = organizationContextUtil.hasRole("TEAM_MANAGER");
+
+        if (!(isOwner || isOrgManager || isDepartmentManager || isTeamManager)) {
+            throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can assign questions.");
+        }
+
         if (survey.isLocked()) {
             throw new LockedException("Survey is locked and cannot be modified");
         }
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + questionId));
-        if (question.isLocked()) {
-            throw new LockedException("Question is locked and cannot be modified");
-        }
+
 
         UUID departmentId = organizationContextUtil.getCurrentDepartmentIdOrNull();
         UUID teamId = organizationContextUtil.getCurrentTeamIdOrNull();
@@ -127,18 +161,28 @@ public class SurveyServiceImpl implements SurveyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
 
+        UUID currentUserId = organizationContextUtil.getCurrentUserId();
+
+        boolean isOwner = survey.getOwnerId().equals(currentUserId);
+        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
+        boolean isDepartmentManager = organizationContextUtil.hasRole("DEPARTMENT_MANAGER");
+        boolean isTeamManager = organizationContextUtil.hasRole("TEAM_MANAGER");
+
+        if (!(isOwner || isOrgManager || isDepartmentManager || isTeamManager)) {
+            throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can unassign questions.");
+        }
+
         if (survey.isLocked()) {
             throw new LockedException("Survey is locked and cannot be modified");
         }
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + questionId));
-        if (question.isLocked()) {
-            throw new LockedException("Question is locked and cannot be modified");
-        }
+
 
         assignedQuestionService.unassignQuestionFromSurvey(surveyId, questionId);
     }
+
     @Override
     public List<SurveyDto> getSurveysByOrganization(UUID organizationId) {
         List<Survey> surveys = surveyRepository.findByOrganizationId(organizationId);
@@ -151,8 +195,19 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public SurveyDto lockSurvey(UUID id) {
         Survey survey = surveyRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + id));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+
+        UUID currentUserId = organizationContextUtil.getCurrentUserId();
+
+        boolean isOwner = survey.getOwnerId().equals(currentUserId);
+        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
+        boolean isDepartmentManager = organizationContextUtil.hasRole("DEPARTMENT_MANAGER");
+        boolean isTeamManager = organizationContextUtil.hasRole("TEAM_MANAGER");
+
+        if (!(isOwner || isOrgManager || isDepartmentManager || isTeamManager)) {
+            throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can lock a survey.");
+        }
 
         survey.setLocked(true);
         surveyRepository.save(survey);
@@ -162,8 +217,19 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public SurveyDto unlockSurvey(UUID id) {
         Survey survey = surveyRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + id));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+
+        UUID currentUserId = organizationContextUtil.getCurrentUserId();
+
+        boolean isOwner = survey.getOwnerId().equals(currentUserId);
+        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
+        boolean isDepartmentManager = organizationContextUtil.hasRole("DEPARTMENT_MANAGER");
+        boolean isTeamManager = organizationContextUtil.hasRole("TEAM_MANAGER");
+
+        if (!(isOwner || isOrgManager || isDepartmentManager || isTeamManager)) {
+            throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can unlock a survey.");
+        }
 
         survey.setLocked(false);
         surveyRepository.save(survey);

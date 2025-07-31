@@ -68,5 +68,16 @@ public class OrganizationContextUtil {
         String teamIdStr = getHeaderValue(HEADER_TEAM_ID);
         return (teamIdStr != null && !teamIdStr.isBlank()) ? UUID.fromString(teamIdStr) : null;
     }
+    public boolean hasRole(String roleToCheck) {
+        String rolesStr = getHeaderValue(HEADER_ROLES);
+        if (rolesStr == null) return false;
+        String[] roles = rolesStr.split(",");
+        for (String role : roles) {
+            if (role.trim().equals(roleToCheck)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

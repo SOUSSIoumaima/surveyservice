@@ -83,7 +83,6 @@ public class QuestionServiceImpl implements QuestionService {
 
         List<OptionDto> incomingOptions = questionDto.getOptions();
 
-        // Créer une nouvelle liste d'options synchronisées
         List<Option> updatedOptions = incomingOptions.stream().map(optDto -> {
             Option opt;
             if (optDto.getOptionId() != null) {
@@ -96,8 +95,8 @@ public class QuestionServiceImpl implements QuestionService {
             } else {
                 // Nouvelle option à créer
                 opt = new Option();
-                opt.setQuestion(existing);
             }
+            opt.setQuestion(existing); // toujours définir la question
             opt.setOptionText(optDto.getOptionText());
             opt.setCorrect(optDto.isCorrect());
             opt.setOptionScore(optDto.getOptionScore());
@@ -105,15 +104,16 @@ public class QuestionServiceImpl implements QuestionService {
             return opt;
         }).collect(Collectors.toList());
 
-        // Remplacer la liste des options dans la question
-        existing.setOptions(updatedOptions);
+        // Eviter de remplacer la liste complète (problèmes Hibernate)
+        existing.getOptions().clear();
+        existing.getOptions().addAll(updatedOptions);
 
-        // Sauvegarder la question (et les options synchronisées grâce à cascade et orphanRemoval)
         Question updated = questionRepository.save(existing);
 
         return QuestionMapper.toDTO(updated);
     }
 
+    
     @Override
     public List<QuestionDto> getBySubject(String subject) {
         List<Question> questions = questionRepository.findBySubjectContainingIgnoreCase(subject);

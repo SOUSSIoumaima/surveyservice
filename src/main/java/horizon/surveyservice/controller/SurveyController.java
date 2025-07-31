@@ -51,13 +51,13 @@ public class SurveyController {
     }
 
     @PutMapping("/{surveyId}")
-    @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT','ORG_MANAGER')")
     public ResponseEntity<SurveyDto> updateSurvey(@PathVariable UUID surveyId, @RequestBody SurveyDto surveyDto) {
         SurveyDto updatedSurvey = surveyService.updateSurvey(surveyId, surveyDto);
         return ResponseEntity.ok(updatedSurvey);
     }
     @DeleteMapping("/{surveyId}")
-    @PreAuthorize("hasAnyAuthority('SURVEY_DELETE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_DELETE','SYS_ADMIN_ROOT','ORG_MANAGER')")
     public ResponseEntity<List<SurveyDto>> deleteSurvey(@PathVariable UUID surveyId) {
         surveyService.deleteSurvey(surveyId);
         List<SurveyDto> surveys = surveyService.getAllSurveys();
@@ -65,7 +65,7 @@ public class SurveyController {
     }
 
     @PostMapping("/{surveyId}/question/{questionId}")
-    @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_LOCK','SYS_ADMIN_ROOT','ORG_MANAGER','DEPARTMENT_MANAGER','TEAM_MANAGER')")
     public ResponseEntity<SurveyDto> assignQuestionToSurvey(@PathVariable UUID surveyId,
                                                             @PathVariable UUID questionId) {
         surveyService.assignQuestionToSurvey(surveyId, questionId, null, null);
@@ -73,20 +73,20 @@ public class SurveyController {
     }
 
     @DeleteMapping("/{surveyId}/question/{questionId}")
-    @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_LOCK','SYS_ADMIN_ROOT','ORG_MANAGER','DEPARTMENT_MANAGER','TEAM_MANAGER')")
     public ResponseEntity<SurveyDto> unassignQuestionFromSurvey(@PathVariable UUID surveyId, @PathVariable UUID questionId) {
         surveyService.unassignQuestionFromSurvey(surveyId, questionId);
         return ResponseEntity.ok(surveyService.getSurveyById(surveyId));
     }
 
     @PatchMapping("/{id}/lock")
-    @PreAuthorize("hasAnyAuthority('SURVEY_LOCK','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_LOCK','SYS_ADMIN_ROOT','ORG_MANAGER','DEPARTMENT_MANAGER','TEAM_MANAGER')")
     public ResponseEntity<SurveyDto> lockSurvey(@PathVariable UUID id) {
         return ResponseEntity.ok(surveyService.lockSurvey(id));
     }
 
     @PatchMapping("/{id}/unlock")
-    @PreAuthorize("hasAnyAuthority('SURVEY_UNLOCK','SYS_ADMIN_ROOT')")
+    @PreAuthorize("hasAnyAuthority('SURVEY_LOCK','SYS_ADMIN_ROOT','ORG_MANAGER','DEPARTMENT_MANAGER','TEAM_MANAGER')")
     public ResponseEntity<SurveyDto> unlockSurvey(@PathVariable UUID id) {
         return ResponseEntity.ok(surveyService.unlockSurvey(id));
     }

@@ -23,7 +23,7 @@ public class Question {
     private QuestionType questionType;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Option> options;
 
     private boolean locked;

@@ -3,6 +3,8 @@ package horizon.surveyservice.service.serviceimpl;
 import horizon.surveyservice.DTO.SurveyDto;
 import horizon.surveyservice.entity.Question;
 import horizon.surveyservice.entity.Survey;
+import horizon.surveyservice.entity.SurveyStatus;
+import horizon.surveyservice.exeptions.BadRequestException;
 import horizon.surveyservice.exeptions.ResourceNotFoundException;
 import horizon.surveyservice.exeptions.LockedException;
 import horizon.surveyservice.mapper.SurveyMapper;
@@ -13,7 +15,10 @@ import horizon.surveyservice.service.SurveyService;
 import horizon.surveyservice.util.OrganizationContextUtil;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +38,17 @@ public class SurveyServiceImpl implements SurveyService {
         this.questionRepository = questionRepository;
         this.assignedQuestionService = assignedQuestionService;
     }
+
+    private void updateSurveyStatusIfExpired(Survey survey) {
+        if (survey.getStatus() == SurveyStatus.ACTIVE
+                && survey.getDeadline() != null
+                && LocalDateTime.now().isAfter(survey.getDeadline())) {
+
+            survey.setStatus(SurveyStatus.CLOSED);
+            surveyRepository.save(survey);
+        }
+    }
+
     @Override
     public SurveyDto createSurvey(SurveyDto surveyDto) {
         UUID currentOrgId = organizationContextUtil.getCurrentOrganizationId();
@@ -47,6 +63,9 @@ public class SurveyServiceImpl implements SurveyService {
     @Override
     public List<SurveyDto> getAllSurveys() {
         List<Survey> surveys = surveyRepository.findAll();
+        for (Survey survey : surveys) {
+            updateSurveyStatusIfExpired(survey);
+        }
         return surveys.stream()
                 .filter(s -> {
                     try {
@@ -66,6 +85,7 @@ public class SurveyServiceImpl implements SurveyService {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(()-> new ResourceNotFoundException("Survey not found with id " + surveyId));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+        updateSurveyStatusIfExpired(survey);
         return SurveyMapper.toSurveyDto(survey);
     }
 
@@ -237,5 +257,51 @@ public class SurveyServiceImpl implements SurveyService {
     }
     public boolean exists(UUID id) {
         return surveyRepository.existsById(id);
+    }
+
+    @Transactional
+    @Override
+    public SurveyDto publishSurvey(UUID surveyId) {
+        Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
+
+        organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+
+        if (survey.getStatus() != SurveyStatus.DRAFT) {
+            throw new BadRequestException("Only surveys in DRAFT status can be published.");
+        }
+
+        if (survey.getAssignedQuestions() == null || survey.getAssignedQuestions().isEmpty()) {
+            throw new BadRequestException("Survey must have at least one assigned question before publishing.");
+        }
+
+        survey.setStatus(SurveyStatus.ACTIVE);
+        survey.setUpdatedAt(LocalDateTime.now());
+        Survey saved = surveyRepository.save(survey);
+        return SurveyMapper.toSurveyDto(saved);
+    }
+
+    @Override
+    public List<SurveyDto> getActiveAndClosedSurveys() {
+        UUID organizationId = organizationContextUtil.getCurrentOrganizationId();
+
+        List<Survey> surveys = surveyRepository.findByOrganizationId(organizationId);
+
+        List<Survey> accessibleSurveys = new ArrayList<>();
+        for (Survey survey : surveys) {
+            try {
+                organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+                updateSurveyStatusIfExpired(survey);
+                if (survey.getStatus() == SurveyStatus.ACTIVE || survey.getStatus() == SurveyStatus.CLOSED) {
+                    accessibleSurveys.add(survey);
+                }
+            } catch (Exception e) {
+                // Ignore surveys auxquels l'utilisateur n'a pas accès
+            }
+        }
+
+        return accessibleSurveys.stream()
+                .map(SurveyMapper::toSurveyDto)
+                .collect(Collectors.toList());
     }
 }

@@ -17,5 +17,7 @@ public interface SurveyService {
     SurveyDto lockSurvey(UUID id);
     SurveyDto unlockSurvey(UUID id);
     boolean exists(UUID id);
+    SurveyDto publishSurvey(UUID surveyId);
+    List<SurveyDto> getActiveAndClosedSurveys();
 
 }

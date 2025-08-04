@@ -96,4 +96,17 @@ public class SurveyController {
         return ResponseEntity.ok(exists);
     }
 
+    @PutMapping("/{surveyId}/publish")
+    @PreAuthorize("hasAnyAuthority('SURVEY_UPDATE','SYS_ADMIN_ROOT','ORG_MANAGER')")
+    public ResponseEntity<SurveyDto> publishSurvey(@PathVariable UUID surveyId) {
+        SurveyDto publishedSurvey = surveyService.publishSurvey(surveyId);
+        return ResponseEntity.ok(publishedSurvey);
+    }
+    @GetMapping("/active-closed")
+    @PreAuthorize("hasAnyAuthority('SURVEY_READ','SYS_ADMIN_ROOT')")
+    public ResponseEntity<List<SurveyDto>> getActiveAndClosedSurveys() {
+        List<SurveyDto> surveys = surveyService.getActiveAndClosedSurveys();
+        return ResponseEntity.ok(surveys);
+    }
+
 }

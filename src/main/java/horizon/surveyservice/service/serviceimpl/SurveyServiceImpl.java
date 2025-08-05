@@ -268,9 +268,12 @@ public class SurveyServiceImpl implements SurveyService {
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
 
         if (survey.getStatus() != SurveyStatus.DRAFT) {
-            throw new BadRequestException("Only surveys in DRAFT status can be published.");
+            if (survey.getStatus() == SurveyStatus.CLOSED) {
+                throw new BadRequestException("Closed surveys cannot be republished.");
+            } else {
+                throw new BadRequestException("Only surveys in DRAFT status can be published.");
+            }
         }
-
         if (survey.getAssignedQuestions() == null || survey.getAssignedQuestions().isEmpty()) {
             throw new BadRequestException("Survey must have at least one assigned question before publishing.");
         }

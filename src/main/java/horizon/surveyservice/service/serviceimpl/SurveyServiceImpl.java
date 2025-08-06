@@ -267,21 +267,22 @@ public class SurveyServiceImpl implements SurveyService {
 
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
 
-        if (survey.getStatus() != SurveyStatus.DRAFT) {
-            if (survey.getStatus() == SurveyStatus.CLOSED) {
-                throw new BadRequestException("Closed surveys cannot be republished.");
-            } else {
-                throw new BadRequestException("Only surveys in DRAFT status can be published.");
-            }
+        if (survey.getStatus() == SurveyStatus.CLOSED) {
+            throw new BadRequestException("Closed surveys cannot be republished.");
         }
+
+        if (survey.getStatus() != SurveyStatus.DRAFT) {
+            throw new BadRequestException("Only surveys in DRAFT status can be published.");
+        }
+
         if (survey.getAssignedQuestions() == null || survey.getAssignedQuestions().isEmpty()) {
             throw new BadRequestException("Survey must have at least one assigned question before publishing.");
         }
 
         survey.setStatus(SurveyStatus.ACTIVE);
-        survey.setUpdatedAt(LocalDateTime.now());
-        Survey saved = surveyRepository.save(survey);
-        return SurveyMapper.toSurveyDto(saved);
+        surveyRepository.save(survey);
+
+        return SurveyMapper.toSurveyDto(survey);
     }
 
     @Override

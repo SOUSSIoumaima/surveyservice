@@ -7,6 +7,7 @@ import horizon.surveyservice.mapper.SurveyResponseMapper;
 import horizon.surveyservice.repository.QuestionResponseRepository;
 import horizon.surveyservice.repository.SurveyResponseRepository;
 import horizon.surveyservice.service.SurveyResponseService;
+import horizon.surveyservice.util.OrganizationContextUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,13 +18,19 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
 
     private final SurveyResponseRepository surveyResponseRepository;
     private final QuestionResponseRepository questionResponseRepository;
-    public SurveyResponseServiceImpl(SurveyResponseRepository surveyResponseRepository, QuestionResponseRepository questionResponseRepository) {
+    private final OrganizationContextUtil organizationContextUtil;
+    public SurveyResponseServiceImpl(SurveyResponseRepository surveyResponseRepository, QuestionResponseRepository questionResponseRepository, OrganizationContextUtil organizationContextUtil) {
         this.surveyResponseRepository = surveyResponseRepository;
         this.questionResponseRepository = questionResponseRepository;
+        this.organizationContextUtil = organizationContextUtil;
     }
     @Override
     public SurveyResponseDto submitSurveyResponse(SurveyResponseDto surveyResponseDto) {
         SurveyResponse surveyResponse = SurveyResponseMapper.toEntity(surveyResponseDto);
+
+        UUID currentUserId = organizationContextUtil.getCurrentUserId();
+        surveyResponse.setRespondentId(currentUserId);
+
         if (surveyResponse.getQuestionResponses() != null) {
             surveyResponse.getQuestionResponses().forEach(questionResponse -> {
                 questionResponse.setSurveyResponse(surveyResponse);
@@ -34,7 +41,14 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
                     });
                 }
             });
+
+            // Calcul du score total
+            long totalScore = surveyResponse.getQuestionResponses().stream()
+                    .mapToLong(q -> q.getQuestionScore() != null ? q.getQuestionScore() : 0L)
+                    .sum();
+            surveyResponse.setTotalScore(totalScore);
         }
+
         SurveyResponse saved = surveyResponseRepository.save(surveyResponse);
         return SurveyResponseMapper.toDto(saved);
     }
@@ -60,6 +74,7 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
                 .orElseThrow(()-> new ResourceNotFoundException("Survey Response Not Found with id: " + surveyResponseId));
         existing.setSubmittedAt(surveyResponseDto.getSubmittedAt());
         existing.setTotalScore(surveyResponseDto.getTotalScore());
+        existing.setFinal(surveyResponseDto.isFinal());
         SurveyResponse updated = surveyResponseRepository.save(existing);
         return SurveyResponseMapper.toDto(updated);
     }

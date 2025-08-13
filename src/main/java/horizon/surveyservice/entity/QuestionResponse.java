@@ -10,19 +10,20 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name= "questionResponse")
+@Table(name = "question_response")
 public class QuestionResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(updatable = false, nullable = false)
     private UUID questionResponseId;
     private UUID questionId;
+    @JsonBackReference
     @ManyToOne
-    @JoinColumn(name= "surveyResponseId",referencedColumnName = "surveyResponseId")
+    @JoinColumn(name = "surveyResponseId", referencedColumnName = "surveyResponseId")
     private SurveyResponse surveyResponse;
     private String questionText;
     @JsonManagedReference
-    @OneToMany(mappedBy = "questionResponse", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "questionResponse", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OptionResponse> optionResponses;
     private Long questionScore;
     private LocalDateTime submittedAt;

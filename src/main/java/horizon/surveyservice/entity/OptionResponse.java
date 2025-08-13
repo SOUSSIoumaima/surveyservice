@@ -6,13 +6,13 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name= "optionResponse")
+@Table(name = "option_response")
 public class OptionResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(updatable = false, nullable = false)
     private UUID optionResponseId;
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private UUID optionId;
     @JsonBackReference
     @ManyToOne

@@ -8,31 +8,34 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table
+@Table(name = "survey_response")
 public class SurveyResponse {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(updatable = false, nullable = false)
     private UUID surveyResponseId;
     private UUID surveyId;
-//    private UUID respondentId;
+    private UUID respondentId;
     @JsonBackReference
-    @OneToMany(mappedBy = "surveyResponse", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "surveyResponse", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionResponse> questionResponses;
     private LocalDateTime submittedAt;
     private Long totalScore;
+    private boolean isFinal;
 
-    public SurveyResponse(UUID surveyResponseId, UUID surveyId, List<QuestionResponse> questionResponses, LocalDateTime submittedAt, Long totalScore) {
+    public SurveyResponse(UUID surveyResponseId, UUID surveyId, List<QuestionResponse> questionResponses, LocalDateTime submittedAt, Long totalScore, boolean isFinal) {
         this.surveyResponseId = surveyResponseId;
         this.surveyId = surveyId;
         this.questionResponses = questionResponses;
         this.submittedAt = submittedAt;
         this.totalScore = totalScore;
+        this.isFinal = isFinal;
     }
 
     public SurveyResponse() {
         this.submittedAt = LocalDateTime.now();
     }
+
     @PrePersist
     protected void onCreate() {
         this.submittedAt = LocalDateTime.now();
@@ -54,13 +57,21 @@ public class SurveyResponse {
         this.surveyId = surveyId;
     }
 
-//    public UUID getRespondentId() {
-//        return respondentId;
-//    }
+    public UUID getRespondentId() {
+        return respondentId;
+    }
 
-//    public void setRespondentId(UUID respondentId) {
-//        this.respondentId = respondentId;
-//    }
+    public void setRespondentId(UUID respondentId) {
+        this.respondentId = respondentId;
+    }
+
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    public void setFinal(boolean aFinal) {
+        isFinal = aFinal;
+    }
 
     public List<QuestionResponse> getQuestionResponses() {
         return questionResponses;

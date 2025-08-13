@@ -11,15 +11,17 @@ public class SurveyResponseDto {
     private LocalDateTime submittedAt;
     private Long totalScore;
     private List<QuestionResponseDto> questionResponses;
+    private boolean isFinal;
 
 
-    public SurveyResponseDto(UUID surveyResponseId, UUID surveyId, UUID respondentId, LocalDateTime submittedAt, Long totalScore, List<QuestionResponseDto> questionResponses) {
+    public SurveyResponseDto(UUID surveyResponseId, UUID surveyId, UUID respondentId, LocalDateTime submittedAt, Long totalScore, List<QuestionResponseDto> questionResponses, boolean isFinal) {
         this.surveyResponseId = surveyResponseId;
         this.surveyId = surveyId;
         this.respondentId = respondentId;
         this.submittedAt = submittedAt;
         this.totalScore = totalScore;
         this.questionResponses = questionResponses;
+        this.isFinal = isFinal;
     }
     public SurveyResponseDto() {}
 
@@ -69,5 +71,13 @@ public class SurveyResponseDto {
 
     public void setQuestionResponses(List<QuestionResponseDto> questionResponses) {
         this.questionResponses = questionResponses;
+    }
+
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    public void setFinal(boolean aFinal) {
+        isFinal = aFinal;
     }
 }

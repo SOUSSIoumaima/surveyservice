@@ -1,6 +1,7 @@
 package horizon.surveyservice.service.serviceimpl;
 
 import horizon.surveyservice.DTO.QuestionResponseDto;
+import horizon.surveyservice.entity.OptionResponse;
 import horizon.surveyservice.entity.QuestionResponse;
 import horizon.surveyservice.entity.SurveyResponse;
 import horizon.surveyservice.exeptions.ResourceNotFoundException;
@@ -25,8 +26,20 @@ public class QuestionResponseServiceImpl implements QuestionResponseService {
     @Override
     public QuestionResponseDto submitQuestionResponse(QuestionResponseDto questionResponseDto) {
         SurveyResponse surveyResponse = surveyResponseRepository.findById(questionResponseDto.getSurveyResponseId())
-                .orElseThrow(() -> new ResourceNotFoundException("Survey Response Not Found with id " + questionResponseDto.getSurveyResponseId()));
-        QuestionResponse entity = QuestionResponseMapper.toEntity(questionResponseDto,surveyResponse);
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Survey Response Not Found with id " + questionResponseDto.getSurveyResponseId()));
+
+        QuestionResponse entity = QuestionResponseMapper.toEntity(questionResponseDto, surveyResponse);
+
+        // ⚡ Calcul du score de la question en fonction des options sélectionnées
+        if (entity.getOptionResponses() != null) {
+            long totalOptionScore = entity.getOptionResponses().stream()
+                    .filter(OptionResponse::isSelected)
+                    .mapToLong(OptionResponse::getOptionScore)
+                    .sum();
+            entity.setQuestionScore(totalOptionScore);
+        }
+
         return QuestionResponseMapper.toDto(questionResponseRepository.save(entity));
     }
 
@@ -34,8 +47,17 @@ public class QuestionResponseServiceImpl implements QuestionResponseService {
     public QuestionResponseDto updateQuestionResponse(UUID id, QuestionResponseDto questionResponseDto) {
         QuestionResponse existing = questionResponseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Question Response Not Found with id " + id));
-        existing.setQuestionScore(questionResponseDto.getQuestionScore());
+
         existing.setSubmittedAt(questionResponseDto.getSubmittedAt());
+
+        if (existing.getOptionResponses() != null) {
+            long totalOptionScore = existing.getOptionResponses().stream()
+                    .filter(OptionResponse::isSelected)
+                    .mapToLong(OptionResponse::getOptionScore)
+                    .sum();
+            existing.setQuestionScore(totalOptionScore);
+        }
+
         return QuestionResponseMapper.toDto(questionResponseRepository.save(existing));
     }
 

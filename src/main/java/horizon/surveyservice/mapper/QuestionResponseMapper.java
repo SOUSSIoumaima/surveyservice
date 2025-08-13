@@ -37,6 +37,13 @@ public class QuestionResponseMapper {
         entity.setQuestionScore(dto.getQuestionScore());
         entity.setSubmittedAt(dto.getSubmittedAt());
         entity.setSurveyResponse(surveyResponse);
+        if (dto.getOptionResponses() != null) {
+            entity.setOptionResponses(
+                    dto.getOptionResponses().stream()
+                            .map(optDto -> OptionResponseMapper.toEntity(optDto, entity))
+                            .collect(Collectors.toList())
+            );
+        }
         return entity;
     }
 

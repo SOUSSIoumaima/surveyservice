@@ -1,6 +1,7 @@
 package horizon.surveyservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -14,9 +15,9 @@ public class OptionResponse {
     private UUID optionResponseId;
 //    @Column(nullable = false)
     private UUID optionId;
-    @JsonBackReference
     @ManyToOne
-    @JoinColumn(name= "questionResponseId",referencedColumnName = "questionResponseId")
+    @JoinColumn(name = "questionResponseId")
+    @JsonIgnoreProperties("optionResponses")
     private QuestionResponse questionResponse;
     @Column(nullable = false)
     private String optionText;

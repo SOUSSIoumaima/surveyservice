@@ -19,13 +19,9 @@ public class OptionResponse {
     @JoinColumn(name = "questionResponseId")
     @JsonIgnoreProperties("optionResponses")
     private QuestionResponse questionResponse;
-    @Column(nullable = false)
     private String optionText;
-    @Column(nullable = false)
     private boolean isCorrect;
-    @Column(nullable = false)
     private boolean isSelected;
-    @Column(nullable = false)
     private Long optionScore;
 
     public OptionResponse(UUID optionResponseId, QuestionResponse questionResponse, String optionText, boolean isCorrect, boolean isSelected, Long optionScore) {

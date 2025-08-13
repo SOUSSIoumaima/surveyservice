@@ -20,12 +20,6 @@ public class SurveyResponseController {
 
     @PostMapping
     public ResponseEntity<SurveyResponseDto> submitSurveyResponse(@RequestBody SurveyResponseDto surveyResponseDto){
-        List<QuestionResponseDto> questionResponses = surveyResponseDto.getQuestionResponses();
-
-        long totalScore = questionResponses.stream()
-                .mapToLong(QuestionResponseDto::getQuestionScore)
-                .sum();
-        surveyResponseDto.setTotalScore(totalScore);
         surveyResponseDto.setFinal(false);
         SurveyResponseDto createdSurveyResponse = surveyResponseService.submitSurveyResponse(surveyResponseDto);
         return ResponseEntity.ok(createdSurveyResponse);
@@ -45,23 +39,11 @@ public class SurveyResponseController {
             @PathVariable UUID id,
             @RequestBody SurveyResponseDto surveyResponseDto) {
 
-        // Récupérer la réponse existante
         SurveyResponseDto existingResponse = surveyResponseService.getSurveyResponseById(id);
 
-        // Si la réponse est déjà marquée comme finale → modification interdite
         if (existingResponse.isFinal()) {
-            return ResponseEntity.badRequest()
-                    .body(existingResponse); // On pourrait aussi renvoyer une exception custom
+            return ResponseEntity.badRequest().body(existingResponse);
         }
-
-        // Calcul du score total
-        List<QuestionResponseDto> questionResponses = surveyResponseDto.getQuestionResponses();
-        long totalScore = questionResponses.stream()
-                .mapToLong(QuestionResponseDto::getQuestionScore)
-                .sum();
-        surveyResponseDto.setTotalScore(totalScore);
-
-        // Mise à jour
         SurveyResponseDto updatedSurveyResponse = surveyResponseService.updateSurveyResponse(id, surveyResponseDto);
         return ResponseEntity.ok(updatedSurveyResponse);
     }

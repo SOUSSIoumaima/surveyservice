@@ -16,7 +16,7 @@ public class SurveyResponse {
     private UUID surveyResponseId;
     private UUID surveyId;
     private UUID respondentId;
-    @JsonBackReference
+
     @OneToMany(mappedBy = "surveyResponse", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionResponse> questionResponses;
     private LocalDateTime submittedAt;

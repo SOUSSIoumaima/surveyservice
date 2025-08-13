@@ -1,6 +1,7 @@
 package horizon.surveyservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.ser.std.UUIDSerializer;
 import jakarta.persistence.*;
@@ -17,13 +18,12 @@ public class QuestionResponse {
     @Column(updatable = false, nullable = false)
     private UUID questionResponseId;
     private UUID questionId;
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "surveyResponseId", referencedColumnName = "surveyResponseId")
     private SurveyResponse surveyResponse;
     private String questionText;
-    @JsonManagedReference
     @OneToMany(mappedBy = "questionResponse", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("questionResponse")
     private List<OptionResponse> optionResponses;
     private Long questionScore;
     private LocalDateTime submittedAt;

@@ -30,32 +30,41 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
     public SurveyResponseDto submitSurveyResponse(SurveyResponseDto surveyResponseDto) {
         SurveyResponse surveyResponse = SurveyResponseMapper.toEntity(surveyResponseDto);
 
+        // Récupérer l'utilisateur courant
         UUID currentUserId = organizationContextUtil.getCurrentUserId();
         surveyResponse.setRespondentId(currentUserId);
 
-        if (surveyResponse.getQuestionResponses() != null) {
-            surveyResponse.getQuestionResponses().forEach(questionResponse -> {
-                questionResponse.setSurveyResponse(surveyResponse);
+        if (surveyResponse.getQuestionResponses() != null && !surveyResponse.getQuestionResponses().isEmpty()) {
+            surveyResponse.getQuestionResponses().stream()
+                    .filter(q -> q != null)
+                    .forEach(questionResponse -> {
+                        questionResponse.setSurveyResponse(surveyResponse);
 
-                if (questionResponse.getOptionResponses() != null) {
-                    // Calcul du score de la question en fonction des options sélectionnées
-                    long questionScore = questionResponse.getOptionResponses().stream()
-                            .filter(OptionResponse::isSelected)
-                            .mapToLong(OptionResponse::getOptionScore)
-                            .sum();
-                    questionResponse.setQuestionScore(questionScore);
+                        if (questionResponse.getOptionResponses() != null && !questionResponse.getOptionResponses().isEmpty()) {
+                            long questionScore = questionResponse.getOptionResponses().stream()
+                                    .filter(o -> o != null && o.isSelected())
+                                    .mapToLong(o -> o.getOptionScore() != null ? o.getOptionScore() : 0L)
+                                    .sum();
+                            questionResponse.setQuestionScore(questionScore);
 
-                    questionResponse.getOptionResponses().forEach(optionResponse -> {
-                        optionResponse.setQuestionResponse(questionResponse);
+                            questionResponse.getOptionResponses().forEach(optionResponse -> {
+                                if (optionResponse != null) {
+                                    optionResponse.setQuestionResponse(questionResponse);
+                                }
+                            });
+                        } else {
+                            questionResponse.setQuestionScore(0L); // si pas d'options
+                        }
                     });
-                }
-            });
 
             // Calcul du score total du survey
             long totalScore = surveyResponse.getQuestionResponses().stream()
-                    .mapToLong(QuestionResponse::getQuestionScore)
+                    .filter(q -> q != null)
+                    .mapToLong(q -> q.getQuestionScore() != null ? q.getQuestionScore() : 0L)
                     .sum();
             surveyResponse.setTotalScore(totalScore);
+        } else {
+            surveyResponse.setTotalScore(0L); // si pas de questions
         }
 
         SurveyResponse saved = surveyResponseRepository.save(surveyResponse);

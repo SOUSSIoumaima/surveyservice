@@ -1,6 +1,8 @@
 package horizon.surveyservice.service.serviceimpl;
 
 import horizon.surveyservice.DTO.SurveyResponseDto;
+import horizon.surveyservice.entity.OptionResponse;
+import horizon.surveyservice.entity.QuestionResponse;
 import horizon.surveyservice.entity.SurveyResponse;
 import horizon.surveyservice.exeptions.ResourceNotFoundException;
 import horizon.surveyservice.mapper.SurveyResponseMapper;
@@ -36,15 +38,22 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
                 questionResponse.setSurveyResponse(surveyResponse);
 
                 if (questionResponse.getOptionResponses() != null) {
+                    // Calcul du score de la question en fonction des options sélectionnées
+                    long questionScore = questionResponse.getOptionResponses().stream()
+                            .filter(OptionResponse::isSelected)
+                            .mapToLong(OptionResponse::getOptionScore)
+                            .sum();
+                    questionResponse.setQuestionScore(questionScore);
+
                     questionResponse.getOptionResponses().forEach(optionResponse -> {
                         optionResponse.setQuestionResponse(questionResponse);
                     });
                 }
             });
 
-            // Calcul du score total
+            // Calcul du score total du survey
             long totalScore = surveyResponse.getQuestionResponses().stream()
-                    .mapToLong(q -> q.getQuestionScore() != null ? q.getQuestionScore() : 0L)
+                    .mapToLong(QuestionResponse::getQuestionScore)
                     .sum();
             surveyResponse.setTotalScore(totalScore);
         }

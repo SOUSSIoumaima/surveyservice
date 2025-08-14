@@ -30,9 +30,10 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
     public SurveyResponseDto submitSurveyResponse(SurveyResponseDto surveyResponseDto) {
         SurveyResponse surveyResponse = SurveyResponseMapper.toEntity(surveyResponseDto);
 
-        // Récupérer l'utilisateur courant
         UUID currentUserId = organizationContextUtil.getCurrentUserId();
-        surveyResponse.setRespondentId(currentUserId);
+        if (surveyResponse.getRespondentId() == null) {
+            surveyResponse.setRespondentId(currentUserId);
+        }
 
         if (surveyResponse.getQuestionResponses() != null && !surveyResponse.getQuestionResponses().isEmpty()) {
             surveyResponse.getQuestionResponses().stream()
@@ -53,7 +54,7 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
                                 }
                             });
                         } else {
-                            questionResponse.setQuestionScore(0L); // si pas d'options
+                            questionResponse.setQuestionScore(0L);
                         }
                     });
 

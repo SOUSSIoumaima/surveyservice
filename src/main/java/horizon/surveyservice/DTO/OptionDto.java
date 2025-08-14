@@ -7,17 +7,17 @@ public class OptionDto {
     private UUID optionId;
     private UUID questionId;
     private String optionText;
-    private boolean isCorrect;
+    private boolean correct;
+    private boolean selected;
     private Long optionScore;
-    private boolean isLocked;
 
-    public OptionDto(UUID optionId, UUID questionId, String optionText, Long optionScore, boolean isCorrect, boolean isLocked) {
+    public OptionDto(UUID optionId, UUID questionId, String optionText, Long optionScore, boolean correct,boolean selected) {
         this.optionId = optionId;
         this.questionId = questionId;
         this.optionText = optionText;
         this.optionScore = optionScore;
-        this.isCorrect = isCorrect;
-        this.isLocked = isLocked;
+        this.correct = correct;
+        this.selected = selected;
     }
     public OptionDto() {
     }
@@ -36,11 +36,6 @@ public class OptionDto {
         return optionText;
     }
 
-    public boolean isCorrect() {
-        return isCorrect;
-    }
-
-    public boolean isLocked() {return isLocked;}
 
     public Long getOptionScore() {
         return optionScore;
@@ -58,15 +53,15 @@ public class OptionDto {
         this.optionText = optionText;
     }
 
-    public void setCorrect(boolean correct) {
-        isCorrect = correct;
-    }
-
     public void setOptionScore(Long optionScore) {
         this.optionScore = optionScore;
     }
 
-    public void setLocked(boolean locked) {
-        isLocked = locked;
-    }
+    public boolean isCorrect() {return correct;}
+
+    public void setCorrect(boolean correct) { this.correct = correct;}
+
+    public boolean isSelected() {return selected; }
+
+    public void setSelected(boolean selected) {this.selected = selected; }
 }

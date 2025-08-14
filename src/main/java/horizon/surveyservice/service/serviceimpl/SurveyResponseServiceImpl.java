@@ -96,11 +96,11 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
             throw new BadRequestException("Cannot update a final survey response");
         }
 
-        // Transforme le DTO en entity
         SurveyResponse updatedEntity = SurveyResponseMapper.toEntity(surveyResponseDto);
-        updatedEntity.setSurveyResponseId(existing.getSurveyResponseId()); // garde l'id existant
+        updatedEntity.setSurveyResponseId(existing.getSurveyResponseId());
+        updatedEntity.setRespondentId(existing.getRespondentId());
+        updatedEntity.setSubmittedAt(java.time.LocalDateTime.now());
 
-        // Recalcul des scores
         if (updatedEntity.getQuestionResponses() != null) {
             long totalScore = updatedEntity.getQuestionResponses().stream()
                     .mapToLong(q -> {
@@ -120,12 +120,12 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
             updatedEntity.setTotalScore(0L);
         }
 
-        // Marque comme finale
         updatedEntity.setFinal(true);
 
         SurveyResponse saved = surveyResponseRepository.save(updatedEntity);
         return SurveyResponseMapper.toDto(saved);
     }
+
 
     @Override
     public void deleteSurveyResponse(UUID surveyResponseId) {

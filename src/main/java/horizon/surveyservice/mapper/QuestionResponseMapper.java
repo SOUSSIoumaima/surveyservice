@@ -15,7 +15,7 @@ public class QuestionResponseMapper {
         dto.setQuestionText(entity.getQuestionText());
         dto.setQuestionScore(entity.getQuestionScore());
         dto.setSubmittedAt(entity.getSubmittedAt());
-        if (entity.getOptionResponses() != null) {
+        if (entity.getSurveyResponse() != null) {
             dto.setSurveyResponseId(entity.getSurveyResponse().getSurveyResponseId());
         }
         if (entity.getOptionResponses() != null) {

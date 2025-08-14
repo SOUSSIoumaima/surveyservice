@@ -102,6 +102,7 @@ public class SurveyController {
         SurveyDto publishedSurvey = surveyService.publishSurvey(surveyId);
         return ResponseEntity.ok(publishedSurvey);
     }
+
     @GetMapping("/active-closed")
     @PreAuthorize("hasAnyAuthority('SURVEY_READ','SYS_ADMIN_ROOT')")
     public ResponseEntity<List<SurveyDto>> getActiveAndClosedSurveys() {

@@ -4,6 +4,7 @@ import horizon.surveyservice.DTO.SurveyResponseDto;
 import horizon.surveyservice.entity.OptionResponse;
 import horizon.surveyservice.entity.QuestionResponse;
 import horizon.surveyservice.entity.SurveyResponse;
+import horizon.surveyservice.exeptions.BadRequestException;
 import horizon.surveyservice.exeptions.ResourceNotFoundException;
 import horizon.surveyservice.mapper.SurveyResponseMapper;
 import horizon.surveyservice.repository.QuestionResponseRepository;
@@ -88,13 +89,42 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
 
     @Override
     public SurveyResponseDto updateSurveyResponse(UUID surveyResponseId, SurveyResponseDto surveyResponseDto) {
-        SurveyResponse existing= surveyResponseRepository.findById(surveyResponseId)
-                .orElseThrow(()-> new ResourceNotFoundException("Survey Response Not Found with id: " + surveyResponseId));
-        existing.setSubmittedAt(surveyResponseDto.getSubmittedAt());
-        existing.setTotalScore(surveyResponseDto.getTotalScore());
-        existing.setFinal(surveyResponseDto.isFinal());
-        SurveyResponse updated = surveyResponseRepository.save(existing);
-        return SurveyResponseMapper.toDto(updated);
+        SurveyResponse existing = surveyResponseRepository.findById(surveyResponseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Survey Response Not Found with id: " + surveyResponseId));
+
+        if (existing.isFinal()) {
+            throw new BadRequestException("Cannot update a final survey response");
+        }
+
+        // Transforme le DTO en entity
+        SurveyResponse updatedEntity = SurveyResponseMapper.toEntity(surveyResponseDto);
+        updatedEntity.setSurveyResponseId(existing.getSurveyResponseId()); // garde l'id existant
+
+        // Recalcul des scores
+        if (updatedEntity.getQuestionResponses() != null) {
+            long totalScore = updatedEntity.getQuestionResponses().stream()
+                    .mapToLong(q -> {
+                        if (q.getOptionResponses() != null) {
+                            long score = q.getOptionResponses().stream()
+                                    .filter(OptionResponse::isSelected)
+                                    .mapToLong(o -> o.getOptionScore() != null ? o.getOptionScore() : 0)
+                                    .sum();
+                            q.setQuestionScore(score);
+                            return score;
+                        }
+                        return 0;
+                    })
+                    .sum();
+            updatedEntity.setTotalScore(totalScore);
+        } else {
+            updatedEntity.setTotalScore(0L);
+        }
+
+        // Marque comme finale
+        updatedEntity.setFinal(true);
+
+        SurveyResponse saved = surveyResponseRepository.save(updatedEntity);
+        return SurveyResponseMapper.toDto(saved);
     }
 
     @Override

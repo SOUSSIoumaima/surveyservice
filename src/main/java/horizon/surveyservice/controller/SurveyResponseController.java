@@ -39,11 +39,6 @@ public class SurveyResponseController {
             @PathVariable UUID id,
             @RequestBody SurveyResponseDto surveyResponseDto) {
 
-        SurveyResponseDto existingResponse = surveyResponseService.getSurveyResponseById(id);
-
-        if (existingResponse.isFinal()) {
-            return ResponseEntity.badRequest().body(existingResponse);
-        }
         SurveyResponseDto updatedSurveyResponse = surveyResponseService.updateSurveyResponse(id, surveyResponseDto);
         return ResponseEntity.ok(updatedSurveyResponse);
     }

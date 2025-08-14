@@ -30,10 +30,9 @@ public class SurveyResponseServiceImpl implements SurveyResponseService {
     public SurveyResponseDto submitSurveyResponse(SurveyResponseDto surveyResponseDto) {
         SurveyResponse surveyResponse = SurveyResponseMapper.toEntity(surveyResponseDto);
 
+
         UUID currentUserId = organizationContextUtil.getCurrentUserId();
-        if (surveyResponse.getRespondentId() == null) {
-            surveyResponse.setRespondentId(currentUserId);
-        }
+        surveyResponse.setRespondentId(currentUserId);
 
         if (surveyResponse.getQuestionResponses() != null && !surveyResponse.getQuestionResponses().isEmpty()) {
             surveyResponse.getQuestionResponses().stream()

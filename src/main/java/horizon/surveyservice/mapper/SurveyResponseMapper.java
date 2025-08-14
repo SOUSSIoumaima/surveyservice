@@ -10,7 +10,7 @@ public class SurveyResponseMapper {
         SurveyResponseDto dto = new SurveyResponseDto();
         dto.setSurveyResponseId(entity.getSurveyResponseId());
         dto.setSurveyId(entity.getSurveyId());
-        entity.setRespondentId(dto.getRespondentId());
+        dto.setRespondentId(entity.getRespondentId());
         dto.setSubmittedAt(entity.getSubmittedAt());
         dto.setTotalScore(entity.getTotalScore());
         dto.setFinal(entity.isFinal());

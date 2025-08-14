@@ -23,7 +23,8 @@ public class SurveyResponse {
     private Long totalScore;
     private boolean isFinal;
 
-    public SurveyResponse(UUID surveyResponseId, UUID surveyId, List<QuestionResponse> questionResponses, LocalDateTime submittedAt, Long totalScore, boolean isFinal) {
+    public SurveyResponse(UUID surveyResponseId, UUID surveyId, List<QuestionResponse> questionResponses, LocalDateTime submittedAt, Long totalScore, boolean isFinal,UUID respondentId) {
+        this.respondentId = respondentId;
         this.surveyResponseId = surveyResponseId;
         this.surveyId = surveyId;
         this.questionResponses = questionResponses;

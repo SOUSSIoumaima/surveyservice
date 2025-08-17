@@ -18,6 +18,7 @@ public class GlobalExceptionHandler {
     // ----- RuntimeException -----
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+        System.out.println("GlobalExceptionHandler: RuntimeException caught: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
         if (ex instanceof org.springframework.security.access.AccessDeniedException) {
             throw ex;
         }
@@ -97,6 +98,7 @@ public class GlobalExceptionHandler {
     // ----- Bad Request -----
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequestException(BadRequestException ex) {
+        System.out.println("GlobalExceptionHandler: BadRequestException caught: " + ex.getMessage());
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.BAD_REQUEST.value());
@@ -133,6 +135,7 @@ public class GlobalExceptionHandler {
     // ----- Generic Exception -----
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        System.out.println("GlobalExceptionHandler: Generic Exception caught: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
         ex.printStackTrace();
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());

@@ -1,6 +1,7 @@
 package horizon.surveyservice.security;
 
 
+import horizon.surveyservice.filter.RequestLoggingFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
+    private final RequestLoggingFilter requestLoggingFilter;
 
 
     private static final String[] PUBLIC_ENDPOINTS = {
@@ -39,8 +41,9 @@ public class SecurityConfig {
 
     };
 
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter, RequestLoggingFilter requestLoggingFilter) {
         this.jwtRequestFilter = jwtRequestFilter;
+        this.requestLoggingFilter = requestLoggingFilter;
     }
 
     @Bean
@@ -65,6 +68,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler())
                 )
 
+                .addFilterBefore(requestLoggingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

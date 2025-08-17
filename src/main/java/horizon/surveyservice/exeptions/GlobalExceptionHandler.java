@@ -18,8 +18,7 @@ public class GlobalExceptionHandler {
     // ----- RuntimeException -----
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        if (ex instanceof org.springframework.security.access.AccessDeniedException ||
-                ex instanceof SecurityException) {
+        if (ex instanceof org.springframework.security.access.AccessDeniedException) {
             throw ex;
         }
         Map<String, Object> response = new HashMap<>();
@@ -57,6 +56,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    // ----- Resource Not Found -----
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+            ResourceNotFoundException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        response.put("error", "Not Found");
+        response.put("message", ex.getMessage());
+        response.put("details", "The requested resource was not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     // ----- Access Denied -----
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDeniedException(
@@ -67,6 +79,18 @@ public class GlobalExceptionHandler {
         response.put("error", "Access Denied");
         response.put("message", "Insufficient permissions");
         response.put("details", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    // ----- Security Exception -----
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<Map<String, Object>> handleSecurityException(SecurityException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.FORBIDDEN.value());
+        response.put("error", "Security Error");
+        response.put("message", ex.getMessage());
+        response.put("details", "Access denied due to security constraints");
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 

@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
     // ----- RuntimeException -----
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        if (ex instanceof org.springframework.security.access.AccessDeniedException ||
-                ex instanceof SecurityException) {
+        System.out.println("GlobalExceptionHandler: RuntimeException caught: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
+        if (ex instanceof org.springframework.security.access.AccessDeniedException) {
             throw ex;
         }
         Map<String, Object> response = new HashMap<>();
@@ -57,6 +57,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    // ----- Resource Not Found -----
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+            ResourceNotFoundException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        response.put("error", "Not Found");
+        response.put("message", ex.getMessage());
+        response.put("details", "The requested resource was not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     // ----- Access Denied -----
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDeniedException(
@@ -70,9 +83,22 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    // ----- Security Exception -----
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<Map<String, Object>> handleSecurityException(SecurityException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.FORBIDDEN.value());
+        response.put("error", "Security Error");
+        response.put("message", ex.getMessage());
+        response.put("details", "Access denied due to security constraints");
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
     // ----- Bad Request -----
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequestException(BadRequestException ex) {
+        System.out.println("GlobalExceptionHandler: BadRequestException caught: " + ex.getMessage());
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.BAD_REQUEST.value());
@@ -109,6 +135,7 @@ public class GlobalExceptionHandler {
     // ----- Generic Exception -----
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        System.out.println("GlobalExceptionHandler: Generic Exception caught: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
         ex.printStackTrace();
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());

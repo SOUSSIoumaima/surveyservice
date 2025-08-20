@@ -31,6 +31,9 @@ public class AssignedQuestionServiceImpl implements AssignedQuestionService {
         this.questionRepository = questionRepository;
     }
     public AssignedQuestionDto assignQuestionToSurvey(UUID surveyId, UUID questionId, UUID departmentId, UUID teamId) {
+        if (isQuestionAssignedToSurvey(surveyId, questionId)) {
+            throw new IllegalStateException("This question is already assigned to the survey.");
+        }
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new RuntimeException("Survey not found"));
         Question question = questionRepository.findById(questionId)
@@ -58,6 +61,10 @@ public class AssignedQuestionServiceImpl implements AssignedQuestionService {
     @Override
     public void unassignQuestionFromSurvey(UUID surveyId, UUID questionId) {
         assignedQuestionRepository.deleteBySurvey_SurveyIdAndQuestion_QuestionId(surveyId, questionId);
+    }
+    @Override
+    public boolean isQuestionAssignedToSurvey(UUID surveyId, UUID questionId) {
+        return assignedQuestionRepository.existsBySurvey_SurveyIdAndQuestion_QuestionId(surveyId, questionId);
     }
 }
 

@@ -16,6 +16,10 @@ public class AssignedQuestionMapper {
         dto.setTeamId(entity.getTeamId());
         dto.setAssignedAt(entity.getAssignedAt());
 
+        dto.setLocked(entity.getLocked());
+        dto.setLockedAt(entity.getLockedAt());
+        dto.setLockedBy(entity.getLockedBy());
+
         return dto;
     }
 
@@ -28,6 +32,10 @@ public class AssignedQuestionMapper {
         entity.setDepartmentId(dto.getDepartmentId());
         entity.setTeamId(dto.getTeamId());
         entity.setAssignedAt(dto.getAssignedAt());
+
+        entity.setLocked(dto.getLocked());
+        entity.setLockedAt(dto.getLockedAt());
+        entity.setLockedBy(dto.getLockedBy());
 
         return entity;
     }

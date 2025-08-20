@@ -18,17 +18,15 @@ public class AssignedQuestion {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "questionId", nullable = false)
     private Question question;
-
     private UUID departmentId;
-
-
     private UUID teamId;
-
     private LocalDateTime assignedAt;
+    private Boolean locked;
+    private LocalDateTime lockedAt;
+    private UUID lockedBy;
 
     public AssignedQuestion() {
     }
-
     public UUID getAssignedQuestionId() {
         return assignedQuestionId;
     }
@@ -71,6 +69,30 @@ public class AssignedQuestion {
 
     public LocalDateTime getAssignedAt() {
         return assignedAt;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
+
+    public LocalDateTime getLockedAt() {
+        return lockedAt;
+    }
+
+    public void setLockedAt(LocalDateTime lockedAt) {
+        this.lockedAt = lockedAt;
+    }
+
+    public UUID getLockedBy() {
+        return lockedBy;
+    }
+
+    public void setLockedBy(UUID lockedBy) {
+        this.lockedBy = lockedBy;
     }
 
     public void setAssignedAt(LocalDateTime assignedAt) {

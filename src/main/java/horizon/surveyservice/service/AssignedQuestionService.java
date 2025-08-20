@@ -9,4 +9,6 @@ public interface AssignedQuestionService {
     AssignedQuestionDto assignQuestionToSurvey(UUID surveyId, UUID questionId,UUID departmentId, UUID teamId);
     List<AssignedQuestionDto> getAssignedQuestionsBySurvey(UUID surveyId);
     void unassignQuestionFromSurvey(UUID surveyId, UUID questionId);
+    boolean isQuestionAssignedToSurvey(UUID surveyId, UUID questionId);
+
 }

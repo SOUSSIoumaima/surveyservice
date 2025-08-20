@@ -9,5 +9,7 @@ import java.util.UUID;
 public interface AssignedQuestionRepository extends JpaRepository<AssignedQuestion, UUID> {
     List<AssignedQuestion> findBySurvey_SurveyId(UUID surveyId);
     void deleteBySurvey_SurveyIdAndQuestion_QuestionId(UUID surveyId, UUID questionId);
+    boolean existsBySurvey_SurveyIdAndQuestion_QuestionId(UUID surveyId, UUID questionId);
+
 
 }

@@ -13,7 +13,7 @@ public interface SurveyService {
     SurveyDto updateSurvey(UUID surveyId, SurveyDto surveyDto);
     void deleteSurvey(UUID surveyId);
     void assignQuestionToSurvey(UUID surveyId, UUID questionId, UUID departmentId, UUID teamId);
-    void unassignQuestionFromSurvey(UUID surveyId, UUID questionId);
+    void unassignQuestionFromSurvey(UUID surveyId, UUID assignedQuestionId);
     SurveyDto lockSurvey(UUID id);
     SurveyDto unlockSurvey(UUID id);
     boolean exists(UUID id);

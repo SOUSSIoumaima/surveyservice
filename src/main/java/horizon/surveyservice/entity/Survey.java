@@ -26,6 +26,7 @@ public class Survey {
     private LocalDateTime deadline;
     private boolean locked;
 
+
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AssignedQuestion> assignedQuestions;
 

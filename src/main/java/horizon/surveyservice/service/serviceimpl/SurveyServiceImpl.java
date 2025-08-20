@@ -1,6 +1,7 @@
 package horizon.surveyservice.service.serviceimpl;
 
 import horizon.surveyservice.DTO.SurveyDto;
+import horizon.surveyservice.entity.AssignedQuestion;
 import horizon.surveyservice.entity.Question;
 import horizon.surveyservice.entity.Survey;
 import horizon.surveyservice.entity.SurveyStatus;
@@ -8,6 +9,7 @@ import horizon.surveyservice.exeptions.BadRequestException;
 import horizon.surveyservice.exeptions.ResourceNotFoundException;
 import horizon.surveyservice.exeptions.LockedException;
 import horizon.surveyservice.mapper.SurveyMapper;
+import horizon.surveyservice.repository.AssignedQuestionRepository;
 import horizon.surveyservice.repository.QuestionRepository;
 import horizon.surveyservice.repository.SurveyRepository;
 import horizon.surveyservice.service.AssignedQuestionService;
@@ -28,15 +30,17 @@ public class SurveyServiceImpl implements SurveyService {
 
     private final SurveyRepository surveyRepository;
     private final QuestionRepository questionRepository;
+    private final AssignedQuestionRepository assignedQuestionRepository;
     private final OrganizationContextUtil organizationContextUtil;
     private final AssignedQuestionService assignedQuestionService;
 
-    public SurveyServiceImpl(SurveyRepository surveyRepository, QuestionRepository questionRepository, OrganizationContextUtil organizationContextUtil,AssignedQuestionService assignedQuestionService)
+    public SurveyServiceImpl(SurveyRepository surveyRepository, QuestionRepository questionRepository, OrganizationContextUtil organizationContextUtil,AssignedQuestionService assignedQuestionService, AssignedQuestionRepository assignedQuestionRepository)
     {
         this.organizationContextUtil = organizationContextUtil;
         this.surveyRepository = surveyRepository;
         this.questionRepository = questionRepository;
         this.assignedQuestionService = assignedQuestionService;
+        this.assignedQuestionRepository = assignedQuestionRepository;
     }
 
     private void updateSurveyStatusIfExpired(Survey survey) {
@@ -161,8 +165,8 @@ public class SurveyServiceImpl implements SurveyService {
             throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can assign questions.");
         }
 
-        if (survey.isLocked()) {
-            throw new LockedException("Survey is locked and cannot be modified");
+        if (assignedQuestionService.isQuestionAssignedToSurvey(surveyId, questionId)) {
+            throw new IllegalStateException("This question is already assigned to the survey.");
         }
 
         Question question = questionRepository.findById(questionId)
@@ -176,7 +180,7 @@ public class SurveyServiceImpl implements SurveyService {
     }
 
     @Override
-    public void unassignQuestionFromSurvey(UUID surveyId, UUID questionId) {
+    public void unassignQuestionFromSurvey(UUID surveyId, UUID assignedQuestionId) {
         Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
         organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
@@ -192,16 +196,22 @@ public class SurveyServiceImpl implements SurveyService {
             throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can unassign questions.");
         }
 
-        if (survey.isLocked()) {
-            throw new LockedException("Survey is locked and cannot be modified");
+        AssignedQuestion aq = assignedQuestionRepository.findById(assignedQuestionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Assigned question not found"));
+
+        // Vérifier que la question appartient bien au survey
+        if (!aq.getSurvey().getSurveyId().equals(surveyId)) {
+            throw new IllegalArgumentException("This assigned question does not belong to the given survey.");
         }
 
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + questionId));
+        // Vérifier le lock
+        if (aq.getLocked() != null && aq.getLocked() && !currentUserId.equals(aq.getLockedBy())) {
+            throw new LockedException("This question is locked by another user and cannot be unassigned.");
+        }
 
-
-        assignedQuestionService.unassignQuestionFromSurvey(surveyId, questionId);
+        assignedQuestionRepository.delete(aq);
     }
+
 
     @Override
     public List<SurveyDto> getSurveysByOrganization(UUID organizationId) {
@@ -231,6 +241,16 @@ public class SurveyServiceImpl implements SurveyService {
 
         survey.setLocked(true);
         surveyRepository.save(survey);
+
+        survey.getAssignedQuestions().forEach(aq -> {
+            if (aq.getLocked() == null || !aq.getLocked()) {
+                aq.setLocked(true);
+                aq.setLockedAt(LocalDateTime.now());
+                aq.setLockedBy(currentUserId);
+                assignedQuestionRepository.save(aq);
+            }
+        });
+
         return SurveyMapper.toSurveyDto(survey);
     }
 
@@ -253,6 +273,16 @@ public class SurveyServiceImpl implements SurveyService {
 
         survey.setLocked(false);
         surveyRepository.save(survey);
+
+        survey.getAssignedQuestions().forEach(aq -> {
+            if (aq.getLocked() != null && aq.getLocked()) {
+                aq.setLocked(false);
+                aq.setLockedAt(null);
+                aq.setLockedBy(null);
+                assignedQuestionRepository.save(aq);
+            }
+        });
+
         return SurveyMapper.toSurveyDto(survey);
     }
     public boolean exists(UUID id) {

@@ -15,6 +15,9 @@ public class AssignedQuestionDto {
     private UUID teamId;
 
     private LocalDateTime assignedAt;
+    private Boolean locked;
+    private LocalDateTime lockedAt;
+    private UUID lockedBy;
 
     // 👉 Getters et Setters
 
@@ -60,6 +63,30 @@ public class AssignedQuestionDto {
 
     public LocalDateTime getAssignedAt() {
         return assignedAt;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
+
+    public LocalDateTime getLockedAt() {
+        return lockedAt;
+    }
+
+    public void setLockedAt(LocalDateTime lockedAt) {
+        this.lockedAt = lockedAt;
+    }
+
+    public UUID getLockedBy() {
+        return lockedBy;
+    }
+
+    public void setLockedBy(UUID lockedBy) {
+        this.lockedBy = lockedBy;
     }
 
     public void setAssignedAt(LocalDateTime assignedAt) {

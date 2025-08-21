@@ -52,6 +52,13 @@ public class SurveyServiceImpl implements SurveyService {
             surveyRepository.save(survey);
         }
     }
+    private void updateSurveyLockStatus(Survey survey) {
+        boolean allQuestionsLocked = survey.getAssignedQuestions()
+                .stream()
+                .allMatch(aq -> aq.getLocked() != null && aq.getLocked());
+        survey.setLocked(allQuestionsLocked);
+        surveyRepository.save(survey);
+    }
 
     @Override
     public SurveyDto createSurvey(SurveyDto surveyDto) {
@@ -177,6 +184,8 @@ public class SurveyServiceImpl implements SurveyService {
         UUID teamId = organizationContextUtil.getCurrentTeamIdOrNull();
 
         assignedQuestionService.assignQuestionToSurvey(surveyId, questionId, departmentId, teamId);
+        updateSurveyLockStatus(survey);
+
     }
 
     @Override
@@ -210,6 +219,8 @@ public class SurveyServiceImpl implements SurveyService {
         }
 
         assignedQuestionRepository.delete(aq);
+        updateSurveyLockStatus(survey);
+
     }
 
 
@@ -296,7 +307,7 @@ public class SurveyServiceImpl implements SurveyService {
 
         return SurveyMapper.toSurveyDto(survey);
     }
-    
+
     public boolean exists(UUID id) {
         return surveyRepository.existsById(id);
     }

@@ -104,7 +104,7 @@ public class SurveyServiceImpl implements SurveyService {
 
         boolean isOwner = existing.getOwnerId().equals(currentUserId);
         boolean isRootAdmin = organizationContextUtil.isRootAdmin();
-        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
+        boolean isOrgManager = organizationContextUtil.hasAuthority("ORG_MANAGER");
 
         if (!(isOwner || isRootAdmin || isOrgManager)) {
             throw new AccessDeniedException("Only the owner, ORG_MANAGER, or SYS_ADMIN_ROOT can update this survey.");
@@ -135,7 +135,7 @@ public class SurveyServiceImpl implements SurveyService {
 
         boolean isOwner = existing.getOwnerId().equals(currentUserId);
         boolean isRootAdmin = organizationContextUtil.isRootAdmin();
-        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
+        boolean isOrgManager = organizationContextUtil.hasAuthority("ORG_MANAGER");
 
         if (!(isOwner || isRootAdmin || isOrgManager)) {
             throw new AccessDeniedException("Only the owner, ORG_MANAGER, or SYS_ADMIN_ROOT can delete this survey.");
@@ -157,9 +157,9 @@ public class SurveyServiceImpl implements SurveyService {
         UUID currentUserId = organizationContextUtil.getCurrentUserId();
 
         boolean isOwner = survey.getOwnerId().equals(currentUserId);
-        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
-        boolean isDepartmentManager = organizationContextUtil.hasRole("DEPARTMENT_MANAGER");
-        boolean isTeamManager = organizationContextUtil.hasRole("TEAM_MANAGER");
+        boolean isOrgManager = organizationContextUtil.hasAuthority("ORG_MANAGER");
+        boolean isDepartmentManager = organizationContextUtil.hasAuthority("DEPARTMENT_MANAGER");
+        boolean isTeamManager = organizationContextUtil.hasAuthority("TEAM_MANAGER");
 
         if (!(isOwner || isOrgManager || isDepartmentManager || isTeamManager)) {
             throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can assign questions.");
@@ -188,9 +188,9 @@ public class SurveyServiceImpl implements SurveyService {
         UUID currentUserId = organizationContextUtil.getCurrentUserId();
 
         boolean isOwner = survey.getOwnerId().equals(currentUserId);
-        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
-        boolean isDepartmentManager = organizationContextUtil.hasRole("DEPARTMENT_MANAGER");
-        boolean isTeamManager = organizationContextUtil.hasRole("TEAM_MANAGER");
+        boolean isOrgManager = organizationContextUtil.hasAuthority("ORG_MANAGER");
+        boolean isDepartmentManager = organizationContextUtil.hasAuthority("DEPARTMENT_MANAGER");
+        boolean isTeamManager = organizationContextUtil.hasAuthority("TEAM_MANAGER");
 
         if (!(isOwner || isOrgManager || isDepartmentManager || isTeamManager)) {
             throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can unassign questions.");
@@ -231,9 +231,9 @@ public class SurveyServiceImpl implements SurveyService {
         UUID currentUserId = organizationContextUtil.getCurrentUserId();
 
         boolean isOwner = survey.getOwnerId().equals(currentUserId);
-        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
-        boolean isDepartmentManager = organizationContextUtil.hasRole("DEPARTMENT_MANAGER");
-        boolean isTeamManager = organizationContextUtil.hasRole("TEAM_MANAGER");
+        boolean isOrgManager = organizationContextUtil.hasAuthority("ORG_MANAGER");
+        boolean isDepartmentManager = organizationContextUtil.hasAuthority("DEPARTMENT_MANAGER");
+        boolean isTeamManager = organizationContextUtil.hasAuthority("TEAM_MANAGER");
 
         if (!(isOwner || isOrgManager || isDepartmentManager || isTeamManager)) {
             throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can lock a survey.");
@@ -263,9 +263,9 @@ public class SurveyServiceImpl implements SurveyService {
         UUID currentUserId = organizationContextUtil.getCurrentUserId();
 
         boolean isOwner = survey.getOwnerId().equals(currentUserId);
-        boolean isOrgManager = organizationContextUtil.hasRole("ORG_MANAGER");
-        boolean isDepartmentManager = organizationContextUtil.hasRole("DEPARTMENT_MANAGER");
-        boolean isTeamManager = organizationContextUtil.hasRole("TEAM_MANAGER");
+        boolean isOrgManager = organizationContextUtil.hasAuthority("ORG_MANAGER");
+        boolean isDepartmentManager = organizationContextUtil.hasAuthority("DEPARTMENT_MANAGER");
+        boolean isTeamManager = organizationContextUtil.hasAuthority("TEAM_MANAGER");
 
         if (!(isOwner || isOrgManager || isDepartmentManager || isTeamManager)) {
             throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can unlock a survey.");

@@ -68,16 +68,11 @@ public class OrganizationContextUtil {
         String teamIdStr = getHeaderValue(HEADER_TEAM_ID);
         return (teamIdStr != null && !teamIdStr.isBlank()) ? UUID.fromString(teamIdStr) : null;
     }
-    public boolean hasRole(String roleToCheck) {
-        String rolesStr = getHeaderValue(HEADER_ROLES);
-        if (rolesStr == null) return false;
-        String[] roles = rolesStr.split(",");
-        for (String role : roles) {
-            if (role.trim().equals(roleToCheck)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean hasAuthority(String authority) {
+        return SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals(authority));
     }
 
 }

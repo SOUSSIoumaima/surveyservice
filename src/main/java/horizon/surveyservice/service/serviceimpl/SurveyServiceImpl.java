@@ -239,17 +239,23 @@ public class SurveyServiceImpl implements SurveyService {
             throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can lock a survey.");
         }
 
-        survey.setLocked(true);
-        surveyRepository.save(survey);
-
+        // Lock each assigned question if possible
         survey.getAssignedQuestions().forEach(aq -> {
-            if (aq.getLocked() == null || !aq.getLocked()) {
+            if ((aq.getLocked() == null || !aq.getLocked())
+                    || currentUserId.equals(aq.getLockedBy())) {
                 aq.setLocked(true);
                 aq.setLockedAt(LocalDateTime.now());
                 aq.setLockedBy(currentUserId);
                 assignedQuestionRepository.save(aq);
             }
         });
+
+        // Lock the survey only if all questions are locked
+        boolean allQuestionsLocked = survey.getAssignedQuestions()
+                .stream()
+                .allMatch(aq -> aq.getLocked() != null && aq.getLocked());
+        survey.setLocked(allQuestionsLocked);
+        surveyRepository.save(survey);
 
         return SurveyMapper.toSurveyDto(survey);
     }
@@ -271,11 +277,9 @@ public class SurveyServiceImpl implements SurveyService {
             throw new AccessDeniedException("Only owner, ORG_MANAGER, DEPARTMENT_MANAGER, or TEAM_MANAGER can unlock a survey.");
         }
 
-        survey.setLocked(false);
-        surveyRepository.save(survey);
-
+        // Unlock questions locked by current user
         survey.getAssignedQuestions().forEach(aq -> {
-            if (aq.getLocked() != null && aq.getLocked()) {
+            if (aq.getLocked() != null && aq.getLocked() && currentUserId.equals(aq.getLockedBy())) {
                 aq.setLocked(false);
                 aq.setLockedAt(null);
                 aq.setLockedBy(null);
@@ -283,8 +287,16 @@ public class SurveyServiceImpl implements SurveyService {
             }
         });
 
+        // Survey is unlocked if at least one question is unlocked
+        boolean allQuestionsLocked = survey.getAssignedQuestions()
+                .stream()
+                .allMatch(aq -> aq.getLocked() != null && aq.getLocked());
+        survey.setLocked(allQuestionsLocked);
+        surveyRepository.save(survey);
+
         return SurveyMapper.toSurveyDto(survey);
     }
+    
     public boolean exists(UUID id) {
         return surveyRepository.existsById(id);
     }

@@ -5,6 +5,7 @@ public enum QuestionType {
     FREE_TEXT,
     DATE_PICKER,
     MULTIPLE_CHOICE_TEXT,
+    SINGLE_CHOICE_TEXT,
     MULTIPLE_CHOICE_IMAGE,
     NUMERIC_SCALE,
     YES_NO

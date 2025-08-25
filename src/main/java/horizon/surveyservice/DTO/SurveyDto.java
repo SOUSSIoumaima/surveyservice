@@ -1,5 +1,6 @@
 package horizon.surveyservice.DTO;
 
+import horizon.surveyservice.entity.SurveyResponseType;
 import horizon.surveyservice.entity.SurveyStatus;
 import horizon.surveyservice.entity.SurveyType;
 import jakarta.persistence.OneToMany;
@@ -21,6 +22,7 @@ public class SurveyDto {
     private LocalDateTime deadline;
     private boolean locked;
     private List<AssignedQuestionDto> assignedQuestions;
+    private SurveyResponseType responseType;
 
     public SurveyDto() {}
 
@@ -118,5 +120,13 @@ public class SurveyDto {
 
     public void setAssignedQuestions(List<AssignedQuestionDto> assignedQuestions) {
         this.assignedQuestions = assignedQuestions;
+    }
+
+    public SurveyResponseType getResponseType() {
+        return responseType;
+    }
+
+    public void setResponseType(SurveyResponseType responseType) {
+        this.responseType = responseType;
     }
 }

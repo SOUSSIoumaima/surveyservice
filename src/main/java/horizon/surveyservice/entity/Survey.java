@@ -25,7 +25,7 @@ public class Survey {
     private LocalDateTime updatedAt;
     private LocalDateTime deadline;
     private boolean locked;
-
+    private SurveyResponseType responseType;
 
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AssignedQuestion> assignedQuestions;
@@ -34,12 +34,13 @@ public class Survey {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
-    public Survey( SurveyType type, String title, SurveyStatus status) {
+    public Survey( SurveyType type, String title, SurveyStatus status, SurveyResponseType responseType) {
         this();
 
         this.type = type;
         this.title = title;
         this.status = status;
+        this.responseType = responseType;
     }
     @PrePersist
     protected void onCreate() {
@@ -146,5 +147,13 @@ public class Survey {
 
     public void setAssignedQuestions(List<AssignedQuestion> assignedQuestions) {
         this.assignedQuestions = assignedQuestions;
+    }
+
+    public SurveyResponseType getResponseType() {
+        return responseType;
+    }
+
+    public void setResponseType(SurveyResponseType responseType) {
+        this.responseType = responseType;
     }
 }

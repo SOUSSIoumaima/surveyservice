@@ -126,6 +126,7 @@ public class SurveyServiceImpl implements SurveyService {
         existing.setStatus(surveyDto.getStatus());
         existing.setDeadline(surveyDto.getDeadline());
         existing.setType(surveyDto.getType());
+        existing.setResponseType(surveyDto.getResponseType());
 
         Survey updated = surveyRepository.save(existing);
         return SurveyMapper.toSurveyDto(updated);

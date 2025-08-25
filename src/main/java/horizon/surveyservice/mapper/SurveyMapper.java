@@ -26,6 +26,7 @@ public class SurveyMapper {
         dto.setUpdatedAt(survey.getUpdatedAt());
         dto.setDeadline(survey.getDeadline());
         dto.setLocked(survey.isLocked());
+        dto.setResponseType(survey.getResponseType());
 
         if (survey.getAssignedQuestions() != null && !survey.getAssignedQuestions().isEmpty()) {
             List<AssignedQuestionDto> assignedQuestionDtos = survey.getAssignedQuestions().stream()
@@ -52,10 +53,7 @@ public class SurveyMapper {
         survey.setUpdatedAt(dto.getUpdatedAt());
         survey.setDeadline(dto.getDeadline());
         survey.setLocked(dto.isLocked());
-
-        // ⚠️ NE PAS RÉ-AFFECTER LES questions directement
-        // La relation AssignedQuestion est gérée ailleurs (via AssignedQuestionService)
-
+        survey.setResponseType(dto.getResponseType());
         return survey;
     }
 }

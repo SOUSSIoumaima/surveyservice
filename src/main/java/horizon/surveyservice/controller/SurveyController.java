@@ -109,5 +109,11 @@ public class SurveyController {
         List<SurveyDto> surveys = surveyService.getActiveAndClosedSurveys();
         return ResponseEntity.ok(surveys);
     }
+    @GetMapping("/{surveyId}/hierarchical")
+    @PreAuthorize("hasAnyAuthority('SURVEY_READ','SYS_ADMIN_ROOT','ORG_MANAGER','DEPARTMENT_MANAGER','TEAM_MANAGER')")
+    public ResponseEntity<SurveyDto> getSurveyByIdHierarchical(@PathVariable UUID surveyId) {
+        SurveyDto survey = surveyService.getSurveyByIdHierarchical(surveyId);
+        return ResponseEntity.ok(survey);
+    }
 
 }

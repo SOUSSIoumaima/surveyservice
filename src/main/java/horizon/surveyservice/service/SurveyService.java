@@ -19,5 +19,7 @@ public interface SurveyService {
     boolean exists(UUID id);
     SurveyDto publishSurvey(UUID surveyId);
     List<SurveyDto> getActiveAndClosedSurveys();
+    SurveyDto getSurveyByIdHierarchical(UUID surveyId);
+
 
 }

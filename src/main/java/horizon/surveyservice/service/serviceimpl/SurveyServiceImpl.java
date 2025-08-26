@@ -362,4 +362,40 @@ public class SurveyServiceImpl implements SurveyService {
                 .map(SurveyMapper::toSurveyDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public SurveyDto getSurveyByIdHierarchical(UUID surveyId) {
+        Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found with id " + surveyId));
+
+        organizationContextUtil.validateOrganizationAccess(survey.getOrganizationId());
+        updateSurveyStatusIfExpired(survey);
+
+        UUID currentDepId = organizationContextUtil.getCurrentDepartmentIdOrNull();
+        UUID currentTeamId = organizationContextUtil.getCurrentTeamIdOrNull();
+
+        List<AssignedQuestion> filteredQuestions = survey.getAssignedQuestions()
+                .stream()
+                .filter(aq -> {
+                    // Niveau ORG → toutes les questions visibles
+                    if (aq.getDepartmentId() == null && aq.getTeamId() == null) {
+                        return true;
+                    }
+                    // Niveau DEPARTMENT → visible seulement si user est du même département
+                    if (aq.getDepartmentId() != null && currentDepId != null && aq.getDepartmentId().equals(currentDepId)) {
+                        return true;
+                    }
+                    // Niveau TEAM → visible seulement si user est de la même team
+                    if (aq.getTeamId() != null && currentTeamId != null && aq.getTeamId().equals(currentTeamId)) {
+                        return true;
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+
+        survey.setAssignedQuestions(filteredQuestions);
+
+        return SurveyMapper.toSurveyDto(survey);
+    }
+
 }

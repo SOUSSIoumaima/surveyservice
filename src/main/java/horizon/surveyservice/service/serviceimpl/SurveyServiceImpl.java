@@ -263,9 +263,9 @@ public class SurveyServiceImpl implements SurveyService {
         });
 
         // Lock the survey only if all questions are locked
-        boolean allQuestionsLocked = survey.getAssignedQuestions()
-                .stream()
-                .allMatch(aq -> aq.getLocked() != null && aq.getLocked());
+        boolean allQuestionsLocked = !survey.getAssignedQuestions().isEmpty() &&
+                survey.getAssignedQuestions().stream()
+                        .allMatch(aq -> Boolean.TRUE.equals(aq.getLocked()));
         survey.setLocked(allQuestionsLocked);
         surveyRepository.save(survey);
 
@@ -300,9 +300,9 @@ public class SurveyServiceImpl implements SurveyService {
         });
 
         // Survey is unlocked if at least one question is unlocked
-        boolean allQuestionsLocked = survey.getAssignedQuestions()
-                .stream()
-                .allMatch(aq -> aq.getLocked() != null && aq.getLocked());
+        boolean allQuestionsLocked = !survey.getAssignedQuestions().isEmpty() &&
+                survey.getAssignedQuestions().stream()
+                        .allMatch(aq -> Boolean.TRUE.equals(aq.getLocked()));
         survey.setLocked(allQuestionsLocked);
         surveyRepository.save(survey);
 
